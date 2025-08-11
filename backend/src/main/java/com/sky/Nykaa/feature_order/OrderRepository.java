@@ -6,6 +6,7 @@ import java.util.List;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    // Finds all orders placed by a specific user
-    List<Order> findByUserId(Long userId);
+    // **FIXED**: Changed findByUserId to findByUser_Id
+    // This correctly tells Spring Data JPA to look for the 'id' property within the 'user' object.
+    List<Order> findByUser_Id(Long userId);
 }
