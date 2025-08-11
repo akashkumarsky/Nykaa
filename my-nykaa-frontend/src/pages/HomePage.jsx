@@ -1,7 +1,8 @@
 // src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-import ProductCard from '../components/ProductCard'; // We will create this next
+// FIXED: Corrected the import path to go up two directories.
+import ProductCard from '../ProductCard.jsx';
 
 const PromoBanner = () => (
     <div className="bg-pink-50 p-4 sm:p-8">

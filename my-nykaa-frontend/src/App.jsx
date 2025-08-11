@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 
 // Layout Components
-// FIXED: Added .jsx extension to make import paths explicit.
-import Header from './components/layout/Header.jsx';
-import Footer from './components/layout/Footer.jsx';
+// This path is correct because the 'components' folder is outside 'src'
+import Header from '../components/layout/Header.jsx';
+import Footer from '../components/layout/Footer.jsx';
 
 // Page Components
-// FIXED: Added .jsx extension to make import paths explicit.
+// FIXED: Corrected path to look inside the current 'src' directory
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
