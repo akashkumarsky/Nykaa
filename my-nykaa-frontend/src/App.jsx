@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 
 // Layout Components
 // This path is correct because the 'components' folder is outside 'src'
-import Header from '../components/layout/Header.jsx';
-import Footer from '../components/layout/Footer.jsx';
+import Header from './components/layout/Header.jsx';
+import Footer from './components/layout/Footer.jsx';
 
 // Page Components
 // FIXED: Corrected path to look inside the current 'src' directory
