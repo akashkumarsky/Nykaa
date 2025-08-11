@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -24,17 +26,13 @@ public class OrderService {
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Creates a new order for the given user with the items from the request.
-     * This operation is transactional. If any part fails (e.g., stock issue),
-     * the entire transaction is rolled back.
-     *
-     * @param request The request containing the list of product IDs and quantities.
-     * @param userEmail The email of the currently authenticated user placing the order.
-     * @return The newly created Order entity.
-     */
     @Transactional
     public Order createOrder(CreateOrderRequest request, String userEmail) {
+        // **FIXED**: Added defensive null checks for the request object and its item list.
+        if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalStateException("Order request must contain at least one item.");
+        }
+
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
 
@@ -44,30 +42,38 @@ public class OrderService {
 
         Set<OrderItem> orderItems = new HashSet<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
+        List<Product> productsToUpdate = new ArrayList<>();
 
         for (CreateOrderRequest.OrderItemRequest itemRequest : request.getItems()) {
+            if (itemRequest == null || itemRequest.getProductId() == null) {
+                throw new IllegalStateException("Order item or product ID cannot be null.");
+            }
+
             Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + itemRequest.getProductId()));
+
+            if (product.getPrice() == null) {
+                throw new IllegalStateException("Product " + product.getName() + " (ID: " + product.getId() + ") does not have a valid price.");
+            }
 
             if (product.getStockQuantity() < itemRequest.getQuantity()) {
                 throw new IllegalStateException("Not enough stock for product: " + product.getName());
             }
 
-            // Create a new OrderItem
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
             orderItem.setQuantity(itemRequest.getQuantity());
-            orderItem.setPrice(product.getPrice()); // Lock in the price at time of order
+            orderItem.setPrice(product.getPrice());
             orderItem.setOrder(order);
             orderItems.add(orderItem);
 
-            // Update total amount
             totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
 
-            // Decrease product stock
             product.setStockQuantity(product.getStockQuantity() - itemRequest.getQuantity());
-            productRepository.save(product);
+            productsToUpdate.add(product);
         }
+
+        productRepository.saveAll(productsToUpdate);
 
         order.setOrderItems(orderItems);
         order.setTotalAmount(totalAmount);

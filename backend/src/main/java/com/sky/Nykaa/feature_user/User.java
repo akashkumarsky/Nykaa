@@ -1,13 +1,16 @@
 package com.sky.Nykaa.feature_user;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-@Data
+// **FIXED**: Replaced @Data with more specific annotations
+@Getter
+@Setter
 @NoArgsConstructor
 public class User {
 
