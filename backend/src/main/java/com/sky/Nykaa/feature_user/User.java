@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
-// **FIXED**: Replaced @Data with more specific annotations
 @Getter
 @Setter
 @NoArgsConstructor

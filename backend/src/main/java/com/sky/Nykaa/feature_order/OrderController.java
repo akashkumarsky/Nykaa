@@ -1,6 +1,7 @@
 package com.sky.Nykaa.feature_order;
 
 import com.sky.Nykaa.feature_order.dto.CreateOrderRequest;
+import com.sky.Nykaa.feature_order.dto.OrderDto; // Import the new DTO
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,19 +17,12 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    /**
-     * Endpoint to create a new order.
-     * Accessible only by authenticated users.
-     *
-     * @param request The order creation request from the client.
-     * @param userDetails The details of the logged-in user, injected by Spring Security.
-     * @return The created order details.
-     */
+    // **FIXED**: The method now returns a ResponseEntity<OrderDto> to send the clean DTO.
     @PostMapping
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody CreateOrderRequest request,
-                                             @AuthenticationPrincipal UserDetails userDetails) {
-        // userDetails.getUsername() will return the email in our setup
-        Order createdOrder = orderService.createOrder(request, userDetails.getUsername());
-        return new ResponseEntity<>(createdOrder, HttpStatus.CREATED);
+    public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderRequest request,
+                                                @AuthenticationPrincipal UserDetails userDetails) {
+        // The service is called to create the order and map it to a safe DTO.
+        OrderDto createdOrderDto = orderService.createOrderAndMapToDto(request, userDetails.getUsername());
+        return new ResponseEntity<>(createdOrderDto, HttpStatus.CREATED);
     }
 }

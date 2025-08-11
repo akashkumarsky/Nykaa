@@ -1,17 +1,22 @@
 package com.sky.Nykaa.feature_order;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sky.Nykaa.feature_order.OrderItem;
 import com.sky.Nykaa.feature_user.User;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
 @Table(name = "orders")
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "orderItems")
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,12 +32,10 @@ public class Order {
     private BigDecimal totalAmount;
 
     @Column(nullable = false)
-    private String status; // e.g., "PENDING", "PROCESSING", "SHIPPED", "DELIVERED"
+    private String status;
 
-    // This establishes the one-to-many relationship.
-    // cascade = CascadeType.ALL: Operations (like save) on Order will cascade to its OrderItems.
-    // orphanRemoval = true: If an OrderItem is removed from this set, it's deleted from the DB.
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // This is the "forward" reference, it will be serialized.
     private Set<OrderItem> orderItems;
 
     @PrePersist
