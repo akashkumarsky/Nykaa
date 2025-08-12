@@ -4,6 +4,8 @@ import com.sky.Nykaa.common.exception.ResourceNotFoundException;
 import com.sky.Nykaa.feature_product.dto.CreateProductRequest;
 import com.sky.Nykaa.feature_product.dto.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable; // Import this
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +17,15 @@ public class ProductService {
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private BrandRepository brandRepository;
 
-    public List<ProductDto> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(this::mapEntityToDto)
-                .collect(Collectors.toList());
+    /**
+     * UPDATED: This method now accepts a Pageable object to fetch a specific page of products.
+     * @param pageable Contains pagination information (page number, size, sorting).
+     * @return A Page object containing the products for the requested page and pagination metadata.
+     */
+    public Page<ProductDto> getAllProducts(Pageable pageable) {
+        Page<Product> productPage = productRepository.findAll(pageable);
+        // The .map() function on the Page object is a convenient way to convert a Page<Entity> to a Page<DTO>
+        return productPage.map(this::mapEntityToDto);
     }
 
     public ProductDto getProductById(Long id) {
@@ -46,7 +53,6 @@ public class ProductService {
         return mapEntityToDto(savedProduct);
     }
 
-    // Maps a Product Entity to a public-facing ProductDto
     private ProductDto mapEntityToDto(Product product) {
         ProductDto dto = new ProductDto();
         dto.setId(product.getId());

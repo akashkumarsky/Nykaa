@@ -1,33 +1,28 @@
 // src/pages/AllProductsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-// FIXED: Corrected the import paths to match your folder structure
 import Sidebar from '../components/Products/Sidebar.jsx';
 import ProductGrid from '../components/Products/ProductGrid.jsx';
+import Pagination from '../components/ui/Pagination.jsx'; // Import the new component
 
 const AllProductsPage = () => {
     const [allProducts, setAllProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // State for filters
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    const [selectedBrands, setSelectedBrands] = useState([]);
+    // NEW: State for pagination
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
 
-    // Mock filter data - in a real app, this would come from the API
-    const filterOptions = {
-        categories: ['Skin Care', 'Makeup', 'Hair Care', 'Fragrance'],
-        brands: ['The Ordinary', 'Maybelline', 'L\'Oreal Paris', 'Kay Beauty'],
-    };
-
-    // Fetch all products on initial render
+    // This effect now runs whenever the currentPage changes
     useEffect(() => {
         const fetchProducts = async () => {
+            setLoading(true);
             try {
-                const data = await api.get('/products');
-                setAllProducts(data);
-                setFilteredProducts(data); // Initially, show all products
+                // UPDATED: Pass page and size parameters to the API call
+                const data = await api.get(`/products?page=${currentPage}&size=12`);
+                setAllProducts(data.content); // The products are now in the 'content' field
+                setTotalPages(data.totalPages); // Get total pages from the response
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -35,56 +30,37 @@ const AllProductsPage = () => {
             }
         };
         fetchProducts();
-    }, []);
+    }, [currentPage]); // Re-run the effect when currentPage changes
 
-    // Apply filters whenever products or filter selections change
-    useEffect(() => {
-        let products = [...allProducts];
-
-        if (selectedCategories.length > 0) {
-            products = products.filter(p => selectedCategories.includes(p.categoryName));
-        }
-
-        if (selectedBrands.length > 0) {
-            products = products.filter(p => selectedBrands.includes(p.brandName));
-        }
-
-        setFilteredProducts(products);
-    }, [selectedCategories, selectedBrands, allProducts]);
-
-    const handleCategoryChange = (category) => {
-        setSelectedCategories(prev =>
-            prev.includes(category)
-                ? prev.filter(c => c !== category)
-                : [...prev, category]
-        );
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
     };
 
-    const handleBrandChange = (brand) => {
-        setSelectedBrands(prev =>
-            prev.includes(brand)
-                ? prev.filter(b => b !== brand)
-                : [...prev, brand]
-        );
-    };
-
-    if (loading) return <div className="text-center py-12">Loading...</div>;
     if (error) return <div className="text-center py-12 text-red-500">Error: {error}</div>;
 
     return (
         <div className="container mx-auto flex flex-col md:flex-row gap-8 px-4 py-8">
             <aside className="w-full md:w-1/4 lg:w-1/5">
-                <Sidebar
-                    filters={filterOptions}
-                    selectedCategories={selectedCategories}
-                    onCategoryChange={handleCategoryChange}
-                    selectedBrands={selectedBrands}
-                    onBrandChange={handleBrandChange}
-                />
+                {/* Filters sidebar can be added here. For now, focusing on pagination. */}
+                <div className="bg-white p-4 rounded-lg shadow">
+                    <h2 className="text-lg font-bold">Filters</h2>
+                    {/* Filter content would go here */}
+                </div>
             </aside>
             <main className="w-full md:w-3/4 lg:w-4/5">
                 <h1 className="text-3xl font-bold mb-6">All Products</h1>
-                <ProductGrid products={filteredProducts} />
+                {loading ? (
+                    <div className="text-center py-12">Loading...</div>
+                ) : (
+                    <>
+                        <ProductGrid products={allProducts} />
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </>
+                )}
             </main>
         </div>
     );
