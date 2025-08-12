@@ -1,8 +1,9 @@
 // src/pages/AllProductsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-import Sidebar from '../../components/products/Sidebar';
-import ProductGrid from '../../components/products/ProductGrid';
+// FIXED: Renamed the import to match the new .jsx file extension
+import ProductGrid from './components/ProductGrid.jsx';
+import Sidebar from '../components/products/Sidebar.jsx';
 
 const AllProductsPage = () => {
     const [allProducts, setAllProducts] = useState([]);

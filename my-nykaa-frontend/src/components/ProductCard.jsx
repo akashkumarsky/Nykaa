@@ -1,8 +1,17 @@
-// src/components/ProductCard.jsx
+// components/ProductCard.jsx
 import React from 'react';
 import { Heart } from 'lucide-react';
+import { useCart } from '../context/CartContext.jsx'; // Import the custom hook
 
 const ProductCard = ({ product }) => {
+    // UPDATED: Get the addToCart function and loading state from the context
+    const { addToCart, loading } = useCart();
+
+    const handleAddToCart = () => {
+        // Call the function from the context, passing the product ID and quantity
+        addToCart(product.id, 1);
+    };
+
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden transition-shadow hover:shadow-xl group">
             <div className="relative">
@@ -11,12 +20,17 @@ const ProductCard = ({ product }) => {
                     <Heart size={20} className="text-gray-400 hover:text-pink-500 hover:fill-current" />
                 </button>
             </div>
-            <div className="p-4">
+            <div className="p-4 flex flex-col">
                 <h3 className="font-bold text-gray-800 truncate">{product.brandName}</h3>
                 <p className="text-sm text-gray-600 truncate h-10">{product.name}</p>
                 <p className="text-lg font-bold text-gray-900 mt-2">₹{product.price}</p>
-                <button className="w-full mt-3 bg-pink-500 text-white font-semibold py-2 rounded-md hover:bg-pink-600 transition-colors opacity-0 group-hover:opacity-100">
-                    Add to Bag
+                {/* UPDATED: Attach the handleAddToCart function to the button's onClick event */}
+                <button
+                    onClick={handleAddToCart}
+                    disabled={loading}
+                    className="w-full mt-3 bg-pink-500 text-white font-semibold py-2 rounded-md hover:bg-pink-600 transition-colors opacity-0 group-hover:opacity-100 disabled:bg-pink-300 disabled:opacity-100"
+                >
+                    {loading ? 'Adding...' : 'Add to Bag'}
                 </button>
             </div>
         </div>

@@ -1,22 +1,24 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
+import { CartProvider } from './context/CartContext.jsx';
 
 // Layout Components
-// This path is correct because the 'components' folder is outside 'src'
 import Header from './components/layout/Header.jsx';
 import Footer from './components/layout/Footer.jsx';
+import CartSidebar from './components/cart/CartSidebar.jsx';
 
 // Page Components
-// FIXED: Corrected path to look inside the current 'src' directory
 import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
+import AllProductsPage from './pages/AllProductsPage.jsx';
 
 function App() {
-    const [page, setPage] = useState('home'); // Simple router: 'home', 'login', 'register'
-    const [user, setUser] = useState(null); // Holds user data { user: {...}, jwtToken: "..." }
+    const [page, setPage] = useState('home');
+    const [user, setUser] = useState(null);
+    const [isCartOpen, setIsCartOpen] = useState(false); // State to manage cart sidebar visibility
 
-    // On initial load, check if user data is in localStorage
+    // Check for a logged-in user in local storage on initial app load
     useEffect(() => {
         const storedUser = localStorage.getItem('nykaaUser');
         if (storedUser) {
@@ -24,23 +26,28 @@ function App() {
         }
     }, []);
 
+    // Function to handle successful login
     const handleLoginSuccess = (userData) => {
         setUser(userData);
         localStorage.setItem('nykaaUser', JSON.stringify(userData));
     };
 
+    // Function to handle logout
     const handleLogout = () => {
         setUser(null);
         localStorage.removeItem('nykaaUser');
-        setPage('home');
+        setPage('home'); // Redirect to home page after logout
     };
 
+    // Simple router to render the correct page based on the 'page' state
     const renderPage = () => {
         switch (page) {
             case 'login':
                 return <LoginPage setPage={setPage} onLoginSuccess={handleLoginSuccess} />;
             case 'register':
                 return <RegisterPage setPage={setPage} onLoginSuccess={handleLoginSuccess} />;
+            case 'products':
+                return <AllProductsPage />;
             case 'home':
             default:
                 return <HomePage />;
@@ -48,13 +55,21 @@ function App() {
     };
 
     return (
-        <div className="bg-white font-sans flex flex-col min-h-screen">
-            <Header setPage={setPage} user={user?.user} onLogout={handleLogout} />
-            <main className="flex-grow">
-                {renderPage()}
-            </main>
-            <Footer />
-        </div>
+        <CartProvider user={user}>
+            <div className="bg-white font-sans flex flex-col min-h-screen">
+                <Header
+                    setPage={setPage}
+                    user={user?.user}
+                    onLogout={handleLogout}
+                    onCartClick={() => setIsCartOpen(true)} // Pass function to open the cart
+                />
+                <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+                <main className="flex-grow">
+                    {renderPage()}
+                </main>
+                <Footer />
+            </div>
+        </CartProvider>
     );
 }
 
