@@ -12,13 +12,13 @@ import HomePage from './pages/HomePage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import AllProductsPage from './pages/AllProductsPage.jsx';
+import CheckoutPage from './pages/CheckoutPage.jsx';
 
 function App() {
     const [page, setPage] = useState('home');
     const [user, setUser] = useState(null);
-    const [isCartOpen, setIsCartOpen] = useState(false); // State to manage cart sidebar visibility
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
-    // Check for a logged-in user in local storage on initial app load
     useEffect(() => {
         const storedUser = localStorage.getItem('nykaaUser');
         if (storedUser) {
@@ -26,20 +26,17 @@ function App() {
         }
     }, []);
 
-    // Function to handle successful login
     const handleLoginSuccess = (userData) => {
         setUser(userData);
         localStorage.setItem('nykaaUser', JSON.stringify(userData));
     };
 
-    // Function to handle logout
     const handleLogout = () => {
         setUser(null);
         localStorage.removeItem('nykaaUser');
-        setPage('home'); // Redirect to home page after logout
+        setPage('home');
     };
 
-    // Simple router to render the correct page based on the 'page' state
     const renderPage = () => {
         switch (page) {
             case 'login':
@@ -48,6 +45,8 @@ function App() {
                 return <RegisterPage setPage={setPage} onLoginSuccess={handleLoginSuccess} />;
             case 'products':
                 return <AllProductsPage />;
+            case 'checkout':
+                return <CheckoutPage setPage={setPage} />;
             case 'home':
             default:
                 return <HomePage />;
@@ -61,9 +60,14 @@ function App() {
                     setPage={setPage}
                     user={user?.user}
                     onLogout={handleLogout}
-                    onCartClick={() => setIsCartOpen(true)} // Pass function to open the cart
+                    onCartClick={() => setIsCartOpen(true)}
                 />
-                <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+                {/* FIXED: Pass the setPage function as a prop to the sidebar */}
+                <CartSidebar
+                    isOpen={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
+                    setPage={setPage}
+                />
                 <main className="flex-grow">
                     {renderPage()}
                 </main>

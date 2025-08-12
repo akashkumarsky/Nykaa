@@ -1,3 +1,4 @@
+// src/main/java/com/sky/Nykaa/feature_order/dto/CreateOrderRequest.java
 package com.sky.Nykaa.feature_order.dto;
 
 import jakarta.validation.Valid;
@@ -11,10 +12,13 @@ import java.util.List;
 public class CreateOrderRequest {
 
     @NotEmpty
-    @Valid // This ensures that the objects inside the list are also validated
+    @Valid
     private List<OrderItemRequest> items;
 
-    // Inner class representing a single item in the order request
+    // UPDATED: Added a field to receive the shipping address.
+    @NotEmpty
+    private String shippingAddress;
+
     @Data
     public static class OrderItemRequest {
         @NotNull

@@ -1,3 +1,4 @@
+// src/main/java/com/sky/Nykaa/config/SecurityConfig.java
 package com.sky.Nykaa.config;
 
 import com.sky.Nykaa.feature_auth.jwt.JwtRequestFilter;
@@ -39,16 +40,22 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // **FIXED**: Added .cors() configuration to the security filter chain.
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Add the CORS configuration here
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
+                        // Publicly accessible endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+
+                        // **FIXED**: Added a new rule to secure all order and cart endpoints.
+                        // This ensures that any request to /api/orders/** or /api/cart/**
+                        // requires a valid JWT.
+                        .requestMatchers("/api/orders/**", "/api/cart/**").authenticated()
+
+                        // Fallback for any other request
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -58,21 +65,15 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // **NEW**: This bean defines the specific CORS rules.
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // This is the origin of your React app
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        // These are the HTTP methods you want to allow
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // This allows all headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        // This is important for sending credentials like cookies or auth tokens
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Apply this configuration to all routes
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

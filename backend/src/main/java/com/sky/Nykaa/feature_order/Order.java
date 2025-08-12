@@ -1,7 +1,6 @@
+// src/main/java/com/sky/Nykaa/feature_order/Order.java
 package com.sky.Nykaa.feature_order;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.sky.Nykaa.feature_order.OrderItem;
 import com.sky.Nykaa.feature_user.User;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -34,8 +33,11 @@ public class Order {
     @Column(nullable = false)
     private String status;
 
+    // UPDATED: Added a field to store the shipping address for the order.
+    @Column(nullable = false, length = 512)
+    private String shippingAddress;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // This is the "forward" reference, it will be serialized.
     private Set<OrderItem> orderItems;
 
     @PrePersist

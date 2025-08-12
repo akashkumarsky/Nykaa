@@ -3,7 +3,8 @@ import React from 'react';
 import { useCart } from '../../context/CartContext.jsx';
 import { X } from 'lucide-react';
 
-const CartSidebar = ({ isOpen, onClose }) => {
+// UPDATED: Added the setPage prop
+const CartSidebar = ({ isOpen, onClose, setPage }) => {
     const { cart, itemCount, loading } = useCart();
 
     const subtotal = cart?.cartItems?.reduce(
@@ -11,11 +12,17 @@ const CartSidebar = ({ isOpen, onClose }) => {
         0
     ) || 0;
 
+    // This function now correctly uses the setPage prop to navigate
+    const handleCheckout = () => {
+        onClose(); // Close the sidebar first
+        setPage('checkout'); // Navigate to the checkout page
+    };
+
     return (
         <>
             {/* Overlay */}
             <div
-                className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                className={`fixed inset-0 bg-[rgba(0,0,0,0.5)] z-40 transition-opacity ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
                 onClick={onClose}
             ></div>
@@ -35,7 +42,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                     {loading && <p className="p-4 text-center">Loading Cart...</p>}
 
                     {!loading && (!cart || cart.cartItems.length === 0) ? (
-                        <div className="flex-grow flex flex-col items-center justify-center text-center p-4">
+                        <div className="flex-grow flex items-center justify-center">
                             <p className="text-gray-500">Your shopping bag is empty.</p>
                         </div>
                     ) : (
@@ -64,6 +71,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
                             <span>₹{subtotal.toFixed(2)}</span>
                         </div>
                         <button
+                            onClick={handleCheckout}
                             disabled={!cart || cart.cartItems.length === 0 || loading}
                             className="w-full bg-pink-500 text-white font-bold py-3 rounded-md hover:bg-pink-600 disabled:bg-pink-300"
                         >

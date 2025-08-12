@@ -1,6 +1,8 @@
 package com.sky.Nykaa.feature_order;
 
 import com.sky.Nykaa.common.exception.ResourceNotFoundException;
+import com.sky.Nykaa.feature_cart.Cart;
+import com.sky.Nykaa.feature_cart.CartRepository;
 import com.sky.Nykaa.feature_order.dto.CreateOrderRequest;
 import com.sky.Nykaa.feature_order.dto.OrderDto;
 import com.sky.Nykaa.feature_order.dto.OrderItemDto;
@@ -27,6 +29,8 @@ public class OrderService {
     @Autowired private OrderRepository orderRepository;
     @Autowired private ProductRepository productRepository;
     @Autowired private UserRepository userRepository;
+    // UPDATED: Injected the CartRepository to allow clearing the cart.
+    @Autowired private CartRepository cartRepository;
 
     public OrderDto createOrderAndMapToDto(CreateOrderRequest request, String userEmail) {
         Order order = createOrderInDatabase(request, userEmail);
@@ -44,6 +48,7 @@ public class OrderService {
         Order order = new Order();
         order.setUser(user);
         order.setStatus("PENDING");
+        order.setShippingAddress(request.getShippingAddress());
 
         Set<OrderItem> orderItems = new HashSet<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -71,7 +76,21 @@ public class OrderService {
         productRepository.saveAll(productsToUpdate);
         order.setOrderItems(orderItems);
         order.setTotalAmount(totalAmount);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+
+        // UPDATED: Logic to clear the user's cart after the order is successfully saved.
+        Cart userCart = cartRepository.findByUser_Id(user.getId())
+                .orElseThrow(() -> new IllegalStateException("Could not find cart for user to clear."));
+        userCart.getCartItems().clear();
+        cartRepository.save(userCart);
+
+        return savedOrder;
+    }
+
+    public List<String> getSavedAddressesForUser(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
+        return orderRepository.findDistinctShippingAddressesByUserId(user.getId());
     }
 
     private OrderDto mapEntityToDto(Order order) {
@@ -103,7 +122,6 @@ public class OrderService {
             productDto.setImageUrl(item.getProduct().getImageUrl());
             productDto.setStockQuantity(item.getProduct().getStockQuantity());
 
-            // **FIXED**: Correctly map the category and brand names from the product entity.
             if (item.getProduct().getCategory() != null) {
                 productDto.setCategoryName(item.getProduct().getCategory().getName());
             }
