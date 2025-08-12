@@ -14,18 +14,16 @@ const AllProductsPage = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    // Filter state
+    // UPDATED: State for multi-select checkboxes and single-select radio
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState([]);
+    const [selectedPrice, setSelectedPrice] = useState('any');
 
-    // UPDATED: filterOptions is now managed by state
     const [filterOptions, setFilterOptions] = useState({ categories: [], brands: [] });
 
-    // NEW: This effect fetches the available filter options when the page loads
     useEffect(() => {
         const fetchFilterOptions = async () => {
             try {
-                // Fetch categories and brands from the new API endpoints concurrently
                 const [categoriesData, brandsData] = await Promise.all([
                     api.get('/products/categories'),
                     api.get('/products/brands')
@@ -33,27 +31,24 @@ const AllProductsPage = () => {
                 setFilterOptions({ categories: categoriesData, brands: brandsData });
             } catch (err) {
                 console.error("Failed to fetch filter options:", err);
-                // You could set an error state here as well
             }
         };
         fetchFilterOptions();
-    }, []); // Empty array ensures this runs only once on mount
+    }, []);
 
-    // This effect re-fetches products when page OR filters change
     useEffect(() => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                // Build the query string with pagination and filter parameters
-                const params = new URLSearchParams({
-                    page: currentPage,
-                    size: 12,
-                });
-                if (selectedCategories.length > 0) {
-                    params.append('categories', selectedCategories.join(','));
-                }
-                if (selectedBrands.length > 0) {
-                    params.append('brands', selectedBrands.join(','));
+                const params = new URLSearchParams({ page: currentPage, size: 12 });
+
+                // UPDATED: Append filters correctly for arrays and single values
+                if (selectedCategories.length > 0) params.append('categories', selectedCategories.join(','));
+                if (selectedBrands.length > 0) params.append('brands', selectedBrands.join(','));
+                if (selectedPrice !== 'any') {
+                    const [min, max] = selectedPrice.split('-');
+                    if (min !== '0') params.append('minPrice', min);
+                    if (max !== 'Infinity') params.append('maxPrice', max);
                 }
 
                 const data = await api.get(`/products?${params.toString()}`);
@@ -66,19 +61,18 @@ const AllProductsPage = () => {
             }
         };
         fetchProducts();
-    }, [currentPage, selectedCategories, selectedBrands]); // Re-run effect if these change
+    }, [currentPage, selectedCategories, selectedBrands, selectedPrice]);
 
-    const handlePageChange = (page) => {
-        setCurrentPage(page);
-    };
+    const handlePageChange = (page) => setCurrentPage(page);
 
+    // UPDATED: Handlers for multi-select checkboxes
     const handleCategoryChange = (category) => {
         setSelectedCategories(prev =>
             prev.includes(category)
                 ? prev.filter(c => c !== category)
                 : [...prev, category]
         );
-        setCurrentPage(0); // Reset to first page when filters change
+        setCurrentPage(0);
     };
 
     const handleBrandChange = (brand) => {
@@ -87,7 +81,13 @@ const AllProductsPage = () => {
                 ? prev.filter(b => b !== brand)
                 : [...prev, brand]
         );
-        setCurrentPage(0); // Reset to first page when filters change
+        setCurrentPage(0);
+    };
+
+    // UPDATED: Handler for single-select radio buttons
+    const handlePriceChange = (priceRange) => {
+        setSelectedPrice(priceRange);
+        setCurrentPage(0);
     };
 
     if (error) return <div className="text-center py-12 text-red-500">Error: {error}</div>;
@@ -101,6 +101,8 @@ const AllProductsPage = () => {
                     onCategoryChange={handleCategoryChange}
                     selectedBrands={selectedBrands}
                     onBrandChange={handleBrandChange}
+                    selectedPrice={selectedPrice}
+                    onPriceChange={handlePriceChange}
                 />
             </aside>
             <main className="w-full md:w-3/4 lg:w-4/5">

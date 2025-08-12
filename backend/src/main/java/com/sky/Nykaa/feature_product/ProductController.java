@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -23,16 +24,18 @@ public class ProductController {
 
     /**
      * Handles GET requests to fetch products with optional filtering and pagination.
-     * Example URL: /api/products?page=0&size=12&categories=Makeup&brands=Maybelline
+     * Example URL: /api/products?page=0&size=12&categories=Makeup&brands=Maybelline&minPrice=500&maxPrice=2000
      */
     @GetMapping
     public ResponseEntity<Page<ProductDto>> getAllProducts(
             @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false) List<String> brands,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ProductDto> products = productService.getAllProducts(categories, brands, pageable);
+        Page<ProductDto> products = productService.getAllProducts(categories, brands, minPrice, maxPrice, pageable);
         return ResponseEntity.ok(products);
     }
 

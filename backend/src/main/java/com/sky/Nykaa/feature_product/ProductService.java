@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -19,17 +20,13 @@ public class ProductService {
     @Autowired private BrandRepository brandRepository;
 
     /**
-     * Gets a paginated and optionally filtered list of products.
-     * @param categories A list of category names to filter by (can be null).
-     * @param brands A list of brand names to filter by (can be null).
-     * @param pageable Pagination information.
-     * @return A Page of products.
+     * UPDATED: Method now accepts minPrice and maxPrice for filtering.
      */
-    public Page<ProductDto> getAllProducts(List<String> categories, List<String> brands, Pageable pageable) {
+    public Page<ProductDto> getAllProducts(List<String> categories, List<String> brands, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         List<String> categoryFilter = (categories != null && !categories.isEmpty()) ? categories : null;
         List<String> brandFilter = (brands != null && !brands.isEmpty()) ? brands : null;
 
-        Page<Product> productPage = productRepository.findByFilters(categoryFilter, brandFilter, pageable);
+        Page<Product> productPage = productRepository.findByFilters(categoryFilter, brandFilter, minPrice, maxPrice, pageable);
         return productPage.map(this::mapEntityToDto);
     }
 
@@ -58,16 +55,10 @@ public class ProductService {
         return mapEntityToDto(savedProduct);
     }
 
-    /**
-     * Gets a sorted list of all unique category names for the filter sidebar.
-     */
     public List<String> getAllCategoryNames() {
         return categoryRepository.findAllCategoryNames();
     }
 
-    /**
-     * Gets a sorted list of all unique brand names for the filter sidebar.
-     */
     public List<String> getAllBrandNames() {
         return brandRepository.findAllBrandNames();
     }
