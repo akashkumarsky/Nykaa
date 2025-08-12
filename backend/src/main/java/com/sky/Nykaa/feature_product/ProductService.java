@@ -1,3 +1,4 @@
+// src/main/java/com/sky/Nykaa/feature_product/ProductService.java
 package com.sky.Nykaa.feature_product;
 
 import com.sky.Nykaa.common.exception.ResourceNotFoundException;
@@ -5,10 +6,10 @@ import com.sky.Nykaa.feature_product.dto.CreateProductRequest;
 import com.sky.Nykaa.feature_product.dto.ProductDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable; // Import this
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -18,13 +19,17 @@ public class ProductService {
     @Autowired private BrandRepository brandRepository;
 
     /**
-     * UPDATED: This method now accepts a Pageable object to fetch a specific page of products.
-     * @param pageable Contains pagination information (page number, size, sorting).
-     * @return A Page object containing the products for the requested page and pagination metadata.
+     * Gets a paginated and optionally filtered list of products.
+     * @param categories A list of category names to filter by (can be null).
+     * @param brands A list of brand names to filter by (can be null).
+     * @param pageable Pagination information.
+     * @return A Page of products.
      */
-    public Page<ProductDto> getAllProducts(Pageable pageable) {
-        Page<Product> productPage = productRepository.findAll(pageable);
-        // The .map() function on the Page object is a convenient way to convert a Page<Entity> to a Page<DTO>
+    public Page<ProductDto> getAllProducts(List<String> categories, List<String> brands, Pageable pageable) {
+        List<String> categoryFilter = (categories != null && !categories.isEmpty()) ? categories : null;
+        List<String> brandFilter = (brands != null && !brands.isEmpty()) ? brands : null;
+
+        Page<Product> productPage = productRepository.findByFilters(categoryFilter, brandFilter, pageable);
         return productPage.map(this::mapEntityToDto);
     }
 
@@ -51,6 +56,20 @@ public class ProductService {
 
         Product savedProduct = productRepository.save(product);
         return mapEntityToDto(savedProduct);
+    }
+
+    /**
+     * Gets a sorted list of all unique category names for the filter sidebar.
+     */
+    public List<String> getAllCategoryNames() {
+        return categoryRepository.findAllCategoryNames();
+    }
+
+    /**
+     * Gets a sorted list of all unique brand names for the filter sidebar.
+     */
+    public List<String> getAllBrandNames() {
+        return brandRepository.findAllBrandNames();
     }
 
     private ProductDto mapEntityToDto(Product product) {
