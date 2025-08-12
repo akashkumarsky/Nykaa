@@ -7,7 +7,7 @@ const PromoBanner = () => (
     <div className="bg-pink-50 p-4 sm:p-8">
         <div className="container mx-auto">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img src="https://placehold.co/1200x400/f8bbd0/e91e63?text=FREEDOM+SALE" alt="Freedom Sale Banner" className="w-full h-auto" />
+                <img src="https://images-static.nykaa.com/uploads/3857fb95-8ca8-4769-8877-0a67c677888f.jpeg?tr=cm-pad_resize,w-1200?text=FREEDOM+SALE" alt="Freedom Sale Banner" className="w-full h-auto" />
             </div>
         </div>
     </div>
