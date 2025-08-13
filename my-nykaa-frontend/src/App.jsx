@@ -6,6 +6,7 @@ import { CartProvider } from './context/CartContext.jsx';
 import Header from './components/layout/Header.jsx';
 import Footer from './components/layout/Footer.jsx';
 import CartSidebar from './components/cart/CartSidebar.jsx';
+import MobileMenu from './components/layout/MobileMenu.jsx'; // Import the mobile menu
 
 // Page Components
 import HomePage from './pages/HomePage.jsx';
@@ -20,6 +21,8 @@ function App() {
     const [user, setUser] = useState(null);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
+    // NEW: State to manage the mobile menu's visibility
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     useEffect(() => {
         const storedUser = localStorage.getItem('nykaaUser');
@@ -53,7 +56,6 @@ function App() {
                 return <ProductDetailPage productId={selectedProductId} setPage={setPage} />;
             case 'home':
             default:
-                // UPDATED: Pass the necessary props to HomePage
                 return <HomePage setPage={setPage} setSelectedProductId={setSelectedProductId} />;
         }
     };
@@ -66,11 +68,20 @@ function App() {
                     user={user?.user}
                     onLogout={handleLogout}
                     onCartClick={() => setIsCartOpen(true)}
+                    onMenuClick={() => setIsMenuOpen(true)} // Pass the function to open the menu
                 />
                 <CartSidebar
                     isOpen={isCartOpen}
                     onClose={() => setIsCartOpen(false)}
                     setPage={setPage}
+                />
+                {/* NEW: Render the MobileMenu and pass all necessary props */}
+                <MobileMenu
+                    isOpen={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
+                    setPage={setPage}
+                    user={user?.user}
+                    onLogout={handleLogout}
                 />
                 <main className="flex-grow">
                     {renderPage()}
