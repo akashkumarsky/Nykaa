@@ -4,7 +4,9 @@ import { api } from '../api';
 import Sidebar from '../components/Products/Sidebar.jsx';
 import ProductGrid from '../components/Products/ProductGrid.jsx';
 import Pagination from '../components/ui/Pagination.jsx';
-import ProductPreviewModal from '../components/products/ProductPreviewModal.jsx'; // Import the modal
+import ProductPreviewModal from '../components/products/ProductPreviewModal.jsx';
+import FilterModal from '../components/products/FilterModal.jsx'; // Import the new modal
+import { Filter } from 'lucide-react'; // Import filter icon
 
 const AllProductsPage = ({ setPage, setSelectedProductId }) => {
     const [products, setProducts] = useState([]);
@@ -16,9 +18,10 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedPrice, setSelectedPrice] = useState('any');
     const [filterOptions, setFilterOptions] = useState({ categories: [], brands: [] });
-
-    // NEW: State to manage the product preview modal
     const [previewProduct, setPreviewProduct] = useState(null);
+
+    // NEW: State to manage the mobile filter modal's visibility
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     useEffect(() => {
         const fetchFilterOptions = async () => {
@@ -59,21 +62,31 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
         fetchProducts();
     }, [currentPage, selectedCategories, selectedBrands, selectedPrice]);
 
-    // Handler to navigate to the full product detail page
     const handleProductSelect = (id) => {
         setSelectedProductId(id);
         setPage('productDetail');
     };
 
     const handlePageChange = (page) => setCurrentPage(page);
+
     const handleCategoryChange = (category) => {
-        setSelectedCategories(prev => prev.includes(category) ? prev.filter(c => c !== category) : [...prev, category]);
+        setSelectedCategories(prev =>
+            prev.includes(category)
+                ? prev.filter(c => c !== category)
+                : [...prev, category]
+        );
         setCurrentPage(0);
     };
+
     const handleBrandChange = (brand) => {
-        setSelectedBrands(prev => prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]);
+        setSelectedBrands(prev =>
+            prev.includes(brand)
+                ? prev.filter(b => b !== brand)
+                : [...prev, brand]
+        );
         setCurrentPage(0);
     };
+
     const handlePriceChange = (priceRange) => {
         setSelectedPrice(priceRange);
         setCurrentPage(0);
@@ -81,31 +94,48 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
 
     if (error) return <div className="text-center py-12 text-red-500">Error: {error}</div>;
 
+    // A constant to hold the sidebar content, so we can reuse it
+    const sidebarContent = (
+        <Sidebar
+            filters={filterOptions}
+            selectedCategories={selectedCategories}
+            onCategoryChange={handleCategoryChange}
+            selectedBrands={selectedBrands}
+            onBrandChange={handleBrandChange}
+            selectedPrice={selectedPrice}
+            onPriceChange={handlePriceChange}
+        />
+    );
+
     return (
         <>
             <div className="container mx-auto flex flex-col md:flex-row gap-8 px-4 py-8">
-                <aside className="w-full md:w-1/4 lg:w-1/5">
-                    <Sidebar
-                        filters={filterOptions}
-                        selectedCategories={selectedCategories}
-                        onCategoryChange={handleCategoryChange}
-                        selectedBrands={selectedBrands}
-                        onBrandChange={handleBrandChange}
-                        selectedPrice={selectedPrice}
-                        onPriceChange={handlePriceChange}
-                    />
+                {/* Sidebar for Desktop View */}
+                <aside className="hidden md:block w-full md:w-1/4 lg:w-1/5">
+                    {sidebarContent}
                 </aside>
+
                 <main className="w-full md:w-3/4 lg:w-4/5">
-                    <h1 className="text-3xl font-bold mb-6">All Products</h1>
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-3xl font-bold">All Products</h1>
+                        {/* NEW: Filter Button for Mobile View */}
+                        <button
+                            onClick={() => setIsFilterOpen(true)}
+                            className="md:hidden flex items-center gap-2 px-4 py-2 bg-white border rounded-md shadow-sm"
+                        >
+                            <Filter size={16} />
+                            <span>Filters</span>
+                        </button>
+                    </div>
+
                     {loading ? (
                         <div className="text-center py-12">Loading...</div>
                     ) : (
                         <>
-                            {/* UPDATED: Pass both onPreview and onProductSelect handlers to the grid */}
-                            <ProductGrid 
-                                products={products} 
-                                onPreview={setPreviewProduct} 
-                                onProductSelect={handleProductSelect} 
+                            <ProductGrid
+                                products={products}
+                                onPreview={setPreviewProduct}
+                                onProductSelect={handleProductSelect}
                             />
                             <Pagination
                                 currentPage={currentPage}
@@ -116,8 +146,13 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
                     )}
                 </main>
             </div>
-            {/* NEW: Render the modal component */}
+
             <ProductPreviewModal product={previewProduct} onClose={() => setPreviewProduct(null)} />
+
+            {/* NEW: Render the FilterModal for mobile, passing the sidebar as a child */}
+            <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
+                {sidebarContent}
+            </FilterModal>
         </>
     );
 };
