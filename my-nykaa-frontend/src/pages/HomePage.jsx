@@ -1,19 +1,12 @@
+// src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-import ProductGrid from '../components/Products/ProductGrid.jsx'; // Updated path
+import ProductGrid from '../components/Products/ProductGrid.jsx';
 import Pagination from '../components/ui/Pagination.jsx';
+import ProductPreviewModal from '../components/products/ProductPreviewModal.jsx';
+import Carousel from '../components/ui/Carousel.jsx'; // Import the new Carousel component
 
-const PromoBanner = () => (
-    <div className="bg-pink-50 p-4 sm:p-8">
-        <div className="container mx-auto">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <img src="https://placehold.co/1200x400/f8bbd0/e91e63?text=FREEDOM+SALE" alt="Freedom Sale Banner" className="w-full h-auto" />
-            </div>
-        </div>
-    </div>
-);
-
-// UPDATED: ProductSection now accepts onPreview and onProductSelect props
+// This component displays the "Our Bestsellers" section with products
 const ProductSection = ({ onPreview, onProductSelect }) => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,13 +42,12 @@ const ProductSection = ({ onPreview, onProductSelect }) => {
                     <div className="text-center">Loading products...</div>
                 ) : (
                     <>
-                        {/* UPDATED: Pass the functions down to the ProductGrid */}
-                        <ProductGrid 
-                            products={products} 
-                            onPreview={onPreview} 
-                            onProductSelect={onProductSelect} 
+                        <ProductGrid
+                            products={products}
+                            onPreview={onPreview}
+                            onProductSelect={onProductSelect}
                         />
-                        <Pagination 
+                        <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={setCurrentPage}
@@ -67,23 +59,44 @@ const ProductSection = ({ onPreview, onProductSelect }) => {
     );
 };
 
-// UPDATED: HomePage now accepts and passes down the necessary props
+// This is the main component for the entire homepage
 const HomePage = ({ setPage, setSelectedProductId }) => {
-    const [previewProduct, setPreviewProduct] = useState(null); // State for the modal
+    const [previewProduct, setPreviewProduct] = useState(null);
 
     const handleProductSelect = (id) => {
         setSelectedProductId(id);
         setPage('productDetail');
     };
 
+    // Define the images for your carousel
+    const carouselImages = [
+        'https://images-static.nykaa.com/uploads/3857fb95-8ca8-4769-8877-0a67c677888f.jpeg?tr=cm-pad_resize,w-1200?text=Summer+Sale',
+        'https://images-static.nykaa.com/uploads/1f48e067-4588-4ee1-83db-947e1ee69bd2.png?tr=cm-pad_resize,w-1200?text=New+Arrivals',
+        'https://images-static.nykaa.com/uploads/26b5bd30-e525-4a61-9228-374756ee0664.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
+        'https://images-static.nykaa.com/uploads/f275a728-0c68-45e5-93f1-a3d51980783c.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
+
+        'https://images-static.nykaa.com/uploads/96e9cbf1-ae8b-485c-a651-4e04f0cae7bb.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
+
+        'https://images-static.nykaa.com/uploads/e8534451-ddad-4e25-a564-04b324215382.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
+
+        'https://images-static.nykaa.com/uploads/cb4fca98-e689-4ddd-94b5-580b6c8108ff.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
+
+        'https://images-static.nykaa.com/uploads/e8534451-ddad-4e25-a564-04b324215382.jpg?tr=cm-pad_resize,w-1200',
+
+    ];
+
     return (
         <>
-            <PromoBanner />
-            <ProductSection 
-                onPreview={setPreviewProduct} 
-                onProductSelect={handleProductSelect} 
+            {/* UPDATED: Replaced the old static banner with the new Carousel */}
+            <div className="container mx-auto p-4 sm:p-8">
+                <Carousel images={carouselImages} />
+            </div>
+
+            <ProductSection
+                onPreview={setPreviewProduct}
+                onProductSelect={handleProductSelect}
             />
-            {/* We can add the ProductPreviewModal here if needed on the homepage */}
+            <ProductPreviewModal product={previewProduct} onClose={() => setPreviewProduct(null)} />
         </>
     );
 };
