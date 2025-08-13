@@ -1,6 +1,6 @@
 // src/components/products/ProductGrid.jsx
 import React from 'react';
-import ProductCard from '../ProductCard'; // Assuming ProductCard is in components/
+import ProductCard from '../ProductCard'; 
 
 const ProductGrid = ({ products }) => {
     if (products.length === 0) {
