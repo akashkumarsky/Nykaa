@@ -8,27 +8,24 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children, user }) => {
     const [cart, setCart] = useState(null);
-    const [loading, setLoading] = useState(false);
+    // UPDATED: Replaced 'loading' with 'loadingProductId' to track a specific item
+    const [loadingProductId, setLoadingProductId] = useState(null);
     const [error, setError] = useState(null);
 
     const fetchCart = async () => {
         if (!user) {
-            setCart(null); // Clear the cart if the user logs out
+            setCart(null);
             return;
-        };
-        setLoading(true);
+        }
         try {
             const cartData = await api.get('/cart');
             setCart(cartData);
         } catch (err) {
             console.error("Failed to fetch cart:", err);
             setError(err.message);
-        } finally {
-            setLoading(false);
         }
     };
 
-    // This effect runs when a user logs in or on the initial page load
     useEffect(() => {
         fetchCart();
     }, [user]);
@@ -38,24 +35,25 @@ export const CartProvider = ({ children, user }) => {
             alert("Please log in to add items to your cart.");
             return;
         }
-        setLoading(true);
+        // UPDATED: Set the ID of the product that is currently being added
+        setLoadingProductId(productId);
         try {
             const updatedCart = await api.post('/cart/items', { productId, quantity });
-            setCart(updatedCart); // Update the state with the new cart from the backend
+            setCart(updatedCart);
         } catch (err) {
             console.error("Failed to add item to cart:", err);
             setError(err.message);
         } finally {
-            setLoading(false);
+            // UPDATED: Clear the loading ID when the operation is complete
+            setLoadingProductId(null);
         }
     };
 
-    // This object provides the cart data and functions to all components
     const value = {
         cart,
         addToCart,
         fetchCart,
-        loading,
+        loadingProductId, // Pass down the specific ID
         error,
         itemCount: cart?.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0
     };

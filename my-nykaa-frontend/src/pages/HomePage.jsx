@@ -71,8 +71,11 @@ const HomePage = ({ setPage, setSelectedProductId }) => {
     // Define the images for your carousel
     const carouselImages = [
         'https://images-static.nykaa.com/uploads/3857fb95-8ca8-4769-8877-0a67c677888f.jpeg?tr=cm-pad_resize,w-1200?text=Summer+Sale',
+
         'https://images-static.nykaa.com/uploads/1f48e067-4588-4ee1-83db-947e1ee69bd2.png?tr=cm-pad_resize,w-1200?text=New+Arrivals',
+
         'https://images-static.nykaa.com/uploads/26b5bd30-e525-4a61-9228-374756ee0664.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
+        
         'https://images-static.nykaa.com/uploads/f275a728-0c68-45e5-93f1-a3d51980783c.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
 
         'https://images-static.nykaa.com/uploads/96e9cbf1-ae8b-485c-a651-4e04f0cae7bb.jpg?tr=cm-pad_resize,w-1200?text=Free+Shipping',
