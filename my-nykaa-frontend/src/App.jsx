@@ -13,16 +13,14 @@ import LoginPage from './pages/LoginPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import AllProductsPage from './pages/AllProductsPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
-import ProductDetailPage from './pages/ProductDetailPage.jsx'; // Import the new detail page
+import ProductDetailPage from './pages/ProductDetailPage.jsx';
 
 function App() {
     const [page, setPage] = useState('home');
     const [user, setUser] = useState(null);
     const [isCartOpen, setIsCartOpen] = useState(false);
-    // NEW: State to hold the ID of the product to view in detail
     const [selectedProductId, setSelectedProductId] = useState(null);
 
-    // Check for a logged-in user in local storage on initial app load
     useEffect(() => {
         const storedUser = localStorage.getItem('nykaaUser');
         if (storedUser) {
@@ -30,20 +28,17 @@ function App() {
         }
     }, []);
 
-    // Function to handle successful login
     const handleLoginSuccess = (userData) => {
         setUser(userData);
         localStorage.setItem('nykaaUser', JSON.stringify(userData));
     };
 
-    // Function to handle logout
     const handleLogout = () => {
         setUser(null);
         localStorage.removeItem('nykaaUser');
-        setPage('home'); // Redirect to home page after logout
+        setPage('home');
     };
 
-    // Simple router to render the correct page based on the 'page' state
     const renderPage = () => {
         switch (page) {
             case 'login':
@@ -54,12 +49,11 @@ function App() {
                 return <AllProductsPage setPage={setPage} setSelectedProductId={setSelectedProductId} />;
             case 'checkout':
                 return <CheckoutPage setPage={setPage} />;
-            // NEW: Case for the product detail page
             case 'productDetail':
                 return <ProductDetailPage productId={selectedProductId} setPage={setPage} />;
             case 'home':
             default:
-                // Pass the necessary props to HomePage as well
+                // UPDATED: Pass the necessary props to HomePage
                 return <HomePage setPage={setPage} setSelectedProductId={setSelectedProductId} />;
         }
     };
@@ -73,9 +67,9 @@ function App() {
                     onLogout={handleLogout}
                     onCartClick={() => setIsCartOpen(true)}
                 />
-                <CartSidebar 
-                    isOpen={isCartOpen} 
-                    onClose={() => setIsCartOpen(false)} 
+                <CartSidebar
+                    isOpen={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
                     setPage={setPage}
                 />
                 <main className="flex-grow">

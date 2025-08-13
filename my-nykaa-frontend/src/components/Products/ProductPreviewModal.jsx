@@ -14,7 +14,11 @@ const ProductPreviewModal = ({ product, onClose }) => {
 
     return (
         // Backdrop
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center" onClick={onClose}>
+        <div
+            // FIXED: Updated the background class for better transparency rendering.
+            className="fixed inset-0 bg-[rgba(0,0,0,0.6)] z-50 flex justify-center items-center"
+            onClick={onClose}
+        >
             {/* Modal Content */}
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl h-full max-h-[90vh] flex flex-col md:flex-row overflow-hidden" onClick={e => e.stopPropagation()}>
                 {/* Close Button */}
