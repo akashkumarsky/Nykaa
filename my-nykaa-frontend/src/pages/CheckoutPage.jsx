@@ -1,13 +1,14 @@
-// src/pages/CheckoutPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { api } from '../api';
+import OrderSummary from '../components/checkout/OrderSummary.jsx';
 
 const CheckoutPage = ({ setPage }) => {
-    const { cart, itemCount, fetchCart, user } = useCart(); // Get user from cart context for prefill
+    const { cart, fetchCart, user } = useCart();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [orderPlaced, setOrderPlaced] = useState(false);
+
     const [address, setAddress] = useState({ fullName: '', street: '', city: '', zip: '' });
     const [savedAddresses, setSavedAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState('new');
@@ -15,7 +16,10 @@ const CheckoutPage = ({ setPage }) => {
 
     useEffect(() => {
         const fetchAddresses = async () => {
-            if (!user) return;
+            if (!user) {
+                setAddressStatus('none');
+                return;
+            }
             try {
                 const data = await api.get('/orders/addresses');
                 if (data && data.length > 0) {
@@ -57,20 +61,20 @@ const CheckoutPage = ({ setPage }) => {
     };
 
     const subtotal = cart?.cartItems?.reduce((sum, item) => sum + item.product.price * item.quantity, 0) || 0;
-    const shippingCost = subtotal > 500 ? 0 : 50;
-    const total = subtotal + shippingCost;
+    const total = subtotal + (subtotal > 500 ? 0 : 50);
 
     const handlePayment = async (e) => {
         e.preventDefault();
+        if (!cart || cart.cartItems.length === 0) {
+            setError("Your cart is empty.");
+            return;
+        }
         setLoading(true);
         setError(null);
 
         try {
-            // Step 1: Create a Razorpay order from your backend
-            const orderResponse = await api.post('/payment/create-order', { amount: total });
-            const razorpayOrder = JSON.parse(orderResponse);
+            const razorpayOrder = await api.post('/payment/create-order', { amount: total });
 
-            // Step 2: Configure Razorpay options
             const options = {
                 key: 'rzp_test_R5HVrH32DhPWyq', // IMPORTANT: Replace with your Razorpay Key ID
                 amount: razorpayOrder.amount,
@@ -79,7 +83,6 @@ const CheckoutPage = ({ setPage }) => {
                 description: "E-commerce Transaction",
                 order_id: razorpayOrder.id,
                 handler: async function (response) {
-                    // Step 3: This function is called after a successful payment
                     const orderItems = cart.cartItems.map(item => ({
                         productId: item.product.id,
                         quantity: item.quantity,
@@ -88,7 +91,6 @@ const CheckoutPage = ({ setPage }) => {
                         ? selectedAddress
                         : `${address.fullName}, ${address.street}, ${address.city}, ${address.zip}`;
 
-                    // Step 4: Create the order in your database with payment details
                     await api.post('/orders', {
                         items: orderItems,
                         shippingAddress,
@@ -97,18 +99,17 @@ const CheckoutPage = ({ setPage }) => {
                     });
 
                     setOrderPlaced(true);
-                    fetchCart(); // This will clear the cart
+                    fetchCart();
                 },
                 prefill: {
                     name: address.fullName,
-                    email: user?.user?.email, // Prefill user's email
+                    email: user?.user?.email,
                 },
                 theme: {
-                    color: "#e84393" // A pink theme color
+                    color: "#e84393"
                 }
             };
 
-            // Step 5: Open the Razorpay checkout modal
             const rzp = new window.Razorpay(options);
             rzp.open();
 
@@ -143,44 +144,47 @@ const CheckoutPage = ({ setPage }) => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
                     <h2 className="text-xl font-semibold mb-4 border-b pb-2">Shipping Address</h2>
-                    {/* The 'id' of this form is important, and its onSubmit is now handlePayment */}
                     <form id="checkout-form" onSubmit={handlePayment} className="space-y-4">
-                        {/* ... all your address input fields ... */}
+                        {addressStatus === 'found' && (
+                            <div className="mb-4">
+                                <label htmlFor="savedAddress" className="block text-sm font-medium text-gray-700">Select a saved address</label>
+                                <select id="savedAddress" value={selectedAddress} onChange={handleAddressSelect} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500">
+                                    {savedAddresses.map((addr, index) => (
+                                        <option key={index} value={addr}>{addr}</option>
+                                    ))}
+                                    <option value="new">-- Add a New Address --</option>
+                                </select>
+                            </div>
+                        )}
                         <div>
                             <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">Full Name</label>
                             <input type="text" name="fullName" id="fullName" value={address.fullName} onChange={handleInputChange}
                                 disabled={isFormDisabled}
                                 className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 ${isFormDisabled ? 'bg-gray-100' : ''}`} required />
                         </div>
-                        {/* ... other fields ... */}
+                        <div>
+                            <label htmlFor="street" className="block text-sm font-medium text-gray-700">Street Address</label>
+                            <input type="text" name="street" id="street" value={address.street} onChange={handleInputChange}
+                                disabled={isFormDisabled}
+                                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 ${isFormDisabled ? 'bg-gray-100' : ''}`} required />
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex-grow">
+                                <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                                <input type="text" name="city" id="city" value={address.city} onChange={handleInputChange}
+                                    disabled={isFormDisabled}
+                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 ${isFormDisabled ? 'bg-gray-100' : ''}`} required />
+                            </div>
+                            <div>
+                                <label htmlFor="zip" className="block text-sm font-medium text-gray-700">ZIP / Postal Code</label>
+                                <input type="text" name="zip" id="zip" value={address.zip} onChange={handleInputChange}
+                                    disabled={isFormDisabled}
+                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500 ${isFormDisabled ? 'bg-gray-100' : ''}`} required />
+                            </div>
+                        </div>
                     </form>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow h-fit">
-                    <h2 className="text-xl font-semibold mb-4 border-b pb-2">Order Summary</h2>
-                    <div className="space-y-2 text-gray-600">
-                        <div className="flex justify-between">
-                            <span>Subtotal ({itemCount} items)</span>
-                            <span>₹{subtotal.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Shipping</span>
-                            <span>₹{shippingCost.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between font-bold text-lg text-gray-800 border-t pt-2 mt-2">
-                            <span>Total</span>
-                            <span>₹{total.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-                    <button
-                        type="submit"
-                        form="checkout-form" // This links the button to the form
-                        disabled={loading || itemCount === 0}
-                        className="w-full mt-6 bg-pink-500 text-white font-bold py-3 rounded-md hover:bg-pink-600 disabled:bg-pink-300"
-                    >
-                        {loading ? 'Processing...' : 'Proceed to Payment'}
-                    </button>
-                </div>
+                <OrderSummary loading={loading} error={error} />
             </div>
         </div>
     );
