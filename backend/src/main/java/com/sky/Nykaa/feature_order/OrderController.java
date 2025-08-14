@@ -21,9 +21,6 @@ public class OrderController {
 
     /**
      * Handles POST requests to create a new order.
-     * @param request The order details from the client.
-     * @param userDetails The authenticated user, injected by Spring Security.
-     * @return The created order as a clean DTO.
      */
     @PostMapping
     public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderRequest request,
@@ -33,9 +30,17 @@ public class OrderController {
     }
 
     /**
-     * NEW ENDPOINT: Handles GET requests to fetch a user's saved shipping addresses.
-     * @param userDetails The authenticated user, injected by Spring Security.
-     * @return A ResponseEntity containing a list of address strings.
+     * FIXED: This is the missing endpoint. It handles GET requests to fetch the
+     * authenticated user's complete order history.
+     */
+    @GetMapping
+    public ResponseEntity<List<OrderDto>> getOrderHistory(@AuthenticationPrincipal UserDetails userDetails) {
+        List<OrderDto> orders = orderService.getOrdersForUser(userDetails.getUsername());
+        return ResponseEntity.ok(orders);
+    }
+
+    /**
+     * Handles GET requests to fetch a user's saved shipping addresses.
      */
     @GetMapping("/addresses")
     public ResponseEntity<List<String>> getSavedAddresses(@AuthenticationPrincipal UserDetails userDetails) {

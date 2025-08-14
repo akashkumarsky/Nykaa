@@ -1,4 +1,3 @@
-// src/components/layout/MobileMenu.jsx
 import React from 'react';
 import { X } from 'lucide-react';
 
@@ -12,7 +11,6 @@ const MobileMenu = ({ isOpen, onClose, setPage, user, onLogout }) => {
         <>
             {/* Overlay */}
             <div
-                // FIXED: Changed the background class for better transparency.
                 className={`fixed inset-0 bg-[rgba(0,0,0,0.5)] z-40 transition-opacity lg:hidden ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
                 onClick={onClose}
@@ -30,6 +28,10 @@ const MobileMenu = ({ isOpen, onClose, setPage, user, onLogout }) => {
                 </div>
                 <nav className="flex flex-col p-4 space-y-4 text-gray-700 font-semibold">
                     <button onClick={() => handleNavigation('products')} className="text-left">All Products</button>
+                    {/* UPDATED: "My Orders" link is now included and only shows if a user is logged in */}
+                    {user && (
+                        <button onClick={() => handleNavigation('orders')} className="text-left">My Orders</button>
+                    )}
                     <a href="#" className="text-left">Brands</a>
                     <a href="#" className="text-left">Luxe</a>
                 </nav>

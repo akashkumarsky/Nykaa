@@ -93,6 +93,23 @@ public class OrderService {
         return orderRepository.findDistinctShippingAddressesByUserId(user.getId());
     }
 
+    /**
+     * NEW METHOD: Fetches all orders placed by a specific user.
+     * @param userEmail The email of the currently authenticated user.
+     * @return A list of the user's orders, converted to DTOs.
+     */
+    public List<OrderDto> getOrdersForUser(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
+
+        List<Order> orders = orderRepository.findByUser_Id(user.getId());
+
+        // Map the list of Order entities to a list of OrderDto objects
+        return orders.stream()
+                .map(this::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
     private OrderDto mapEntityToDto(Order order) {
         OrderDto orderDto = new OrderDto();
         orderDto.setId(order.getId());

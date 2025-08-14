@@ -71,13 +71,10 @@ const CheckoutPage = ({ setPage }) => {
         setError(null);
         try {
             const orderItems = cart.cartItems.map(item => ({ productId: item.product.id, quantity: item.quantity }));
-            
-            // **FIXED LOGIC**: Determine the correct shipping address to send.
             const shippingAddress = selectedAddress !== 'new'
-                ? selectedAddress // Use the selected address directly if it's not "new"
+                ? selectedAddress
                 : `${address.fullName}, ${address.street}, ${address.city}, ${address.zip}`;
 
-            // Final validation to prevent sending an empty address
             if (shippingAddress.trim() === ',,,') {
                 setError("Please fill out all address fields.");
                 setLoading(false);
@@ -157,6 +154,7 @@ const CheckoutPage = ({ setPage }) => {
                     </form>
                 </div>
 
+                {/* Order Summary Section */}
                 <div className="bg-white p-6 rounded-lg shadow h-fit">
                     <h2 className="text-xl font-semibold mb-4 border-b pb-2">Order Summary</h2>
                     <div className="space-y-2 text-gray-600">
@@ -174,7 +172,12 @@ const CheckoutPage = ({ setPage }) => {
                         </div>
                     </div>
                     {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-                    <button type="submit" form="checkout-form" disabled={loading || itemCount === 0} className="w-full mt-6 bg-pink-500 text-white font-bold py-3 rounded-md hover:bg-pink-600 disabled:bg-pink-300">
+                    <button
+                        type="submit"
+                        form="checkout-form"
+                        disabled={loading || itemCount === 0}
+                        className="w-full mt-6 bg-pink-500 text-white font-bold py-3 rounded-md hover:bg-pink-600 disabled:bg-pink-300"
+                    >
                         {loading ? 'Placing Order...' : 'Place Order'}
                     </button>
                 </div>

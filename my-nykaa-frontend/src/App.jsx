@@ -6,7 +6,7 @@ import { CartProvider } from './context/CartContext.jsx';
 import Header from './components/layout/Header.jsx';
 import Footer from './components/layout/Footer.jsx';
 import CartSidebar from './components/cart/CartSidebar.jsx';
-import MobileMenu from './components/layout/MobileMenu.jsx'; // Import the mobile menu
+import MobileMenu from './components/layout/MobileMenu.jsx';
 
 // Page Components
 import HomePage from './pages/HomePage.jsx';
@@ -15,15 +15,16 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import AllProductsPage from './pages/AllProductsPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
 import ProductDetailPage from './pages/ProductDetailPage.jsx';
+import OrderHistoryPage from './pages/OrderHistoryPage.jsx';
 
 function App() {
     const [page, setPage] = useState('home');
     const [user, setUser] = useState(null);
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const [selectedProductId, setSelectedProductId] = useState(null);
-    // NEW: State to manage the mobile menu's visibility
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState(null);
 
+    // Check for a logged-in user in local storage on initial app load
     useEffect(() => {
         const storedUser = localStorage.getItem('nykaaUser');
         if (storedUser) {
@@ -31,17 +32,20 @@ function App() {
         }
     }, []);
 
+    // Function to handle successful login
     const handleLoginSuccess = (userData) => {
         setUser(userData);
         localStorage.setItem('nykaaUser', JSON.stringify(userData));
     };
 
+    // Function to handle logout
     const handleLogout = () => {
         setUser(null);
         localStorage.removeItem('nykaaUser');
-        setPage('home');
+        setPage('home'); // Redirect to home page after logout
     };
 
+    // Simple router to render the correct page based on the 'page' state
     const renderPage = () => {
         switch (page) {
             case 'login':
@@ -54,6 +58,8 @@ function App() {
                 return <CheckoutPage setPage={setPage} />;
             case 'productDetail':
                 return <ProductDetailPage productId={selectedProductId} setPage={setPage} />;
+            case 'orders':
+                return <OrderHistoryPage />;
             case 'home':
             default:
                 return <HomePage setPage={setPage} setSelectedProductId={setSelectedProductId} />;
@@ -68,14 +74,13 @@ function App() {
                     user={user?.user}
                     onLogout={handleLogout}
                     onCartClick={() => setIsCartOpen(true)}
-                    onMenuClick={() => setIsMenuOpen(true)} // Pass the function to open the menu
+                    onMenuClick={() => setIsMenuOpen(true)}
                 />
-                <CartSidebar
-                    isOpen={isCartOpen}
-                    onClose={() => setIsCartOpen(false)}
+                <CartSidebar 
+                    isOpen={isCartOpen} 
+                    onClose={() => setIsCartOpen(false)} 
                     setPage={setPage}
                 />
-                {/* NEW: Render the MobileMenu and pass all necessary props */}
                 <MobileMenu
                     isOpen={isMenuOpen}
                     onClose={() => setIsMenuOpen(false)}
