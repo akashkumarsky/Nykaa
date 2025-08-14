@@ -1,4 +1,3 @@
-// src/main/java/com/sky/Nykaa/feature_order/dto/CreateOrderRequest.java
 package com.sky.Nykaa.feature_order.dto;
 
 import jakarta.validation.Valid;
@@ -15,9 +14,12 @@ public class CreateOrderRequest {
     @Valid
     private List<OrderItemRequest> items;
 
-    // UPDATED: Added a field to receive the shipping address.
     @NotEmpty
     private String shippingAddress;
+
+    // UPDATED: Added fields to receive payment details from the frontend
+    private String razorpayPaymentId;
+    private String razorpayOrderId;
 
     @Data
     public static class OrderItemRequest {
