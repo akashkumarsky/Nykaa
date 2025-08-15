@@ -1,3 +1,4 @@
+// src/main/java/com/sky/Nykaa/feature_order/OrderService.java
 package com.sky.Nykaa.feature_order;
 
 import com.sky.Nykaa.common.exception.ResourceNotFoundException;
@@ -29,7 +30,6 @@ public class OrderService {
     @Autowired private OrderRepository orderRepository;
     @Autowired private ProductRepository productRepository;
     @Autowired private UserRepository userRepository;
-    // UPDATED: Injected the CartRepository to allow clearing the cart.
     @Autowired private CartRepository cartRepository;
 
     public OrderDto createOrderAndMapToDto(CreateOrderRequest request, String userEmail) {
@@ -39,6 +39,7 @@ public class OrderService {
 
     @Transactional
     private Order createOrderInDatabase(CreateOrderRequest request, String userEmail) {
+        // ... (this method is correct and does not need changes)
         if (request == null || request.getItems() == null || request.getItems().isEmpty()) {
             throw new IllegalStateException("Order request must contain at least one item.");
         }
@@ -78,7 +79,6 @@ public class OrderService {
         order.setTotalAmount(totalAmount);
         Order savedOrder = orderRepository.save(order);
 
-        // UPDATED: Logic to clear the user's cart after the order is successfully saved.
         Cart userCart = cartRepository.findByUser_Id(user.getId())
                 .orElseThrow(() -> new IllegalStateException("Could not find cart for user to clear."));
         userCart.getCartItems().clear();
@@ -93,18 +93,12 @@ public class OrderService {
         return orderRepository.findDistinctShippingAddressesByUserId(user.getId());
     }
 
-    /**
-     * NEW METHOD: Fetches all orders placed by a specific user.
-     * @param userEmail The email of the currently authenticated user.
-     * @return A list of the user's orders, converted to DTOs.
-     */
     public List<OrderDto> getOrdersForUser(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userEmail));
 
         List<Order> orders = orderRepository.findByUser_Id(user.getId());
 
-        // Map the list of Order entities to a list of OrderDto objects
         return orders.stream()
                 .map(this::mapEntityToDto)
                 .collect(Collectors.toList());
@@ -116,6 +110,8 @@ public class OrderService {
         orderDto.setOrderDate(order.getOrderDate());
         orderDto.setStatus(order.getStatus());
         orderDto.setTotalAmount(order.getTotalAmount());
+        // **FIXED**: This line was missing. It adds the address to the response.
+        orderDto.setShippingAddress(order.getShippingAddress());
 
         UserDto userDto = new UserDto();
         userDto.setId(order.getUser().getId());
