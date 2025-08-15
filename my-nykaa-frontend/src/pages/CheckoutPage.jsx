@@ -1,4 +1,3 @@
-// src/pages/CheckoutPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { api } from '../api';
@@ -97,7 +96,6 @@ const CheckoutPage = ({ setPage }) => {
         quantity: item.quantity
       }));
 
-      // 1. Create Razorpay Order
       const paymentOrder = await api.post("/payment/create-order", { amount: total });
       const loaded = await loadRazorpayScript();
       if (!loaded) {
@@ -105,9 +103,8 @@ const CheckoutPage = ({ setPage }) => {
         return;
       }
 
-      // 2. Razorpay options
       const options = {
-        key: "rzp_test_R5HVrH32DhPWyq", // replace with your key
+        key: "rzp_test_R5HVrH32DhPWyq",
         amount: paymentOrder.amount,
         currency: "INR",
         name: "Nykaa Clone",
@@ -159,6 +156,7 @@ const CheckoutPage = ({ setPage }) => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Checkout</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
         {/* Address Form */}
         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4 border-b pb-2">Shipping Address</h2>
@@ -168,7 +166,7 @@ const CheckoutPage = ({ setPage }) => {
               <select
                 value={selectedAddress}
                 onChange={handleAddressSelect}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                className="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
               >
                 {savedAddresses.map((addr, index) => (
                   <option key={index} value={addr}>{addr}</option>
@@ -177,17 +175,50 @@ const CheckoutPage = ({ setPage }) => {
               </select>
             </div>
           )}
+          
           <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-4">
-            <input name="fullName" placeholder="Full Name" value={address.fullName} onChange={handleInputChange} disabled={selectedAddress !== 'new'} required className="input" />
-            <input name="street" placeholder="Street Address" value={address.street} onChange={handleInputChange} disabled={selectedAddress !== 'new'} required className="input" />
-            <div className="flex gap-4">
-              <input name="city" placeholder="City" value={address.city} onChange={handleInputChange} disabled={selectedAddress !== 'new'} required className="input flex-grow" />
-              <input name="zip" placeholder="ZIP" value={address.zip} onChange={handleInputChange} disabled={selectedAddress !== 'new'} required className="input" />
+            <input
+              name="fullName"
+              placeholder="Full Name"
+              value={address.fullName}
+              onChange={handleInputChange}
+              disabled={selectedAddress !== 'new'}
+              required
+              className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            />
+            <input
+              name="street"
+              placeholder="Street Address"
+              value={address.street}
+              onChange={handleInputChange}
+              disabled={selectedAddress !== 'new'}
+              required
+              className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                name="city"
+                placeholder="City"
+                value={address.city}
+                onChange={handleInputChange}
+                disabled={selectedAddress !== 'new'}
+                required
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              />
+              <input
+                name="zip"
+                placeholder="ZIP Code"
+                value={address.zip}
+                onChange={handleInputChange}
+                disabled={selectedAddress !== 'new'}
+                required
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              />
             </div>
           </form>
         </div>
 
-        {/* Summary */}
+        {/* Order Summary */}
         <div className="bg-white p-6 rounded-lg shadow h-fit">
           <h2 className="text-xl font-semibold mb-4 border-b pb-2">Order Summary</h2>
           <div className="space-y-2 text-gray-600">
