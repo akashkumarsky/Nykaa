@@ -11,7 +11,9 @@ const OrderHistoryPage = () => {
         const fetchOrders = async () => {
             try {
                 const data = await api.get('/orders');
-                setOrders(data);
+                // UPDATED: Sort the orders in descending order based on the orderDate
+                const sortedOrders = data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+                setOrders(sortedOrders);
             } catch (err) {
                 setError(err.message);
             } finally {
