@@ -22,7 +22,6 @@ const OrderHistoryPage = () => {
         fetchOrders();
     }, []);
 
-    // Function to get badge styles based on status
     const getStatusClasses = (status) => {
         switch (status?.toLowerCase()) {
             case 'pending':
@@ -50,29 +49,34 @@ const OrderHistoryPage = () => {
                 <div className="space-y-6">
                     {orders.map(order => (
                         <div key={order.id} className="bg-white p-6 rounded-lg shadow">
+                            {/* Order Header */}
                             <div className="flex justify-between items-start border-b pb-3 mb-3">
                                 <div>
-                                    <p className="font-semibold">Order #{order.id}</p>
+                                    <div className="flex items-center gap-3">
+                                        <p className="font-semibold">Order #{order.id}</p>
+                                        <span
+                                            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(order.status)}`}
+                                        >
+                                            {order.status}
+                                        </span>
+                                    </div>
                                     <p className="text-sm text-gray-500">
                                         Placed on: {new Date(order.orderDate).toLocaleDateString()}
                                     </p>
+
                                     {order.shippingAddress && (
-                                        <div className="mt-1 text-sm text-gray-500">
-                                            <p className="font-medium">Shipping Address:</p>
+                                        <div className="mt-2 text-sm border rounded-md p-2 bg-gray-50">
+                                            <p className="font-medium text-gray-700">Shipping Address:</p>
                                             <p className="whitespace-pre-line">{order.shippingAddress}</p>
                                         </div>
                                     )}
                                 </div>
                                 <div className="text-right">
                                     <p className="font-semibold">Total: ₹{order.totalAmount.toFixed(2)}</p>
-                                    <span
-                                        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(order.status)}`}
-                                    >
-                                        {order.status}
-                                    </span>
                                 </div>
                             </div>
 
+                            {/* Items */}
                             <div className="space-y-2">
                                 {order.orderItems.map(item => (
                                     <div key={item.id} className="flex items-center gap-4 text-sm">
