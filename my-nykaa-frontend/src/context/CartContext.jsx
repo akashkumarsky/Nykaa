@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '../api';
 
 const CartContext = createContext();
+
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children, user }) => {
@@ -45,27 +46,41 @@ export const CartProvider = ({ children, user }) => {
         }
     };
 
-    const removeFromCart = (productId) => {
-        if (!cart) return;
-
-        // Remove item locally
-        const updatedCart = {
-            ...cart,
-            cartItems: cart.cartItems.filter(item => item.product.id !== productId)
-        };
-
-        setCart(updatedCart);
+    // NEW: Function to update an item's quantity via API
+    const updateItemQuantity = async (cartItemId, quantity) => {
+        if (!user) return;
+        // Prevent quantity from going below 1
+        const newQuantity = Math.max(1, quantity);
+        try {
+            const updatedCart = await api.put(`/cart/items/${cartItemId}`, { quantity: newQuantity });
+            setCart(updatedCart);
+        } catch (err) {
+            console.error("Failed to update item quantity:", err);
+            setError(err.message);
+        }
     };
 
+    // NEW: Function to remove an item from the cart via API
+    const removeItem = async (cartItemId) => {
+        if (!user) return;
+        try {
+            const updatedCart = await api.delete(`/cart/items/${cartItemId}`);
+            setCart(updatedCart);
+        } catch (err) {
+            console.error("Failed to remove item:", err);
+            setError(err.message);
+        }
+    };
 
     const value = {
         cart,
         addToCart,
-        removeFromCart, // add it to context
         fetchCart,
         loadingProductId,
         error,
-        itemCount: cart?.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0
+        itemCount: cart?.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0,
+        updateItemQuantity, // Expose the new function
+        removeItem,       // Expose the new function
     };
 
     return (
