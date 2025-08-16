@@ -3,8 +3,8 @@ import { ChevronDown } from 'lucide-react';
 
 // A reusable component for each collapsible filter section
 const FilterSection = ({ title, options, selected, onChange, type = 'checkbox' }) => (
-    <details className="border-b py-2" open>
-        <summary className="font-semibold cursor-pointer flex justify-between items-center py-2">
+    <details className="border-b border-pink-200 py-2">
+        <summary className="font-semibold cursor-pointer flex justify-between items-center py-2 text-black-800">
             {title}
             <ChevronDown className="h-5 w-5 transition-transform details-open:rotate-180" />
         </summary>
@@ -18,9 +18,9 @@ const FilterSection = ({ title, options, selected, onChange, type = 'checkbox' }
                         value={option.value || option}
                         checked={selected.includes(option.value || option)}
                         onChange={() => onChange(option.value || option)}
-                        className={`h-4 w-4 border-gray-300 text-pink-600 focus:ring-pink-500 ${type === 'radio' ? 'rounded-full' : 'rounded'}`}
+                        className={`h-4 w-4 border-pink-300 text-black-600 focus:ring-pink-500 ${type === 'radio' ? 'rounded-full' : 'rounded'}`}
                     />
-                    <label htmlFor={`${title}-${option.value || option}`} className="ml-3 text-sm text-gray-600">
+                    <label htmlFor={`${title}-${option.value || option}`} className="ml-3 text-sm text-black-800">
                         {option.label || option}
                     </label>
                 </li>
@@ -45,8 +45,8 @@ const Sidebar = ({
     ];
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-lg font-bold border-b pb-2">Filters</h2>
+        <div className="bg-pink-50 p-4 rounded-lg shadow-md">
+            <h2 className="text-lg font-bold text-black-800 border-b border-pink-200 pb-2">Filters</h2>
             <FilterSection
                 title="Price"
                 options={priceOptions}
