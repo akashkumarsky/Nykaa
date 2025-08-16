@@ -1,12 +1,11 @@
-// src/pages/AllProductsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 import Sidebar from '../components/Products/Sidebar.jsx';
 import ProductGrid from '../components/Products/ProductGrid.jsx';
 import Pagination from '../components/ui/Pagination.jsx';
 import ProductPreviewModal from '../components/products/ProductPreviewModal.jsx';
-import FilterModal from '../components/products/FilterModal.jsx'; // Import the new modal
-import { Filter } from 'lucide-react'; // Import filter icon
+import FilterModal from '../components/products/FilterModal.jsx';
+import { Filter } from 'lucide-react';
 
 const AllProductsPage = ({ setPage, setSelectedProductId }) => {
     const [products, setProducts] = useState([]);
@@ -14,14 +13,25 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
-    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState(() => {
+        const storedCategory = window.localStorage.getItem("selectedCategory");
+        return storedCategory ? [storedCategory] : [];
+    });
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [selectedPrice, setSelectedPrice] = useState('any');
     const [filterOptions, setFilterOptions] = useState({ categories: [], brands: [] });
     const [previewProduct, setPreviewProduct] = useState(null);
-
-    // NEW: State to manage the mobile filter modal's visibility
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    // ✅ On mount, check if user clicked a category from HomePage
+    useEffect(() => {
+        const storedCategory = window.localStorage.getItem("selectedCategory");
+        if (storedCategory) {
+            setSelectedCategories([storedCategory]); // preselect category
+            window.localStorage.removeItem("selectedCategory"); // optional clear
+        }
+    }, []);
+
 
     useEffect(() => {
         const fetchFilterOptions = async () => {
@@ -50,6 +60,7 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
                     if (min !== '0') params.append('minPrice', min);
                     if (max !== 'Infinity') params.append('maxPrice', max);
                 }
+                console.log("Fetching products with params:", params.toString());
                 const data = await api.get(`/products?${params.toString()}`);
                 setProducts(data.content);
                 setTotalPages(data.totalPages);
@@ -94,7 +105,6 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
 
     if (error) return <div className="text-center py-12 text-red-500">Error: {error}</div>;
 
-    // A constant to hold the sidebar content, so we can reuse it
     const sidebarContent = (
         <Sidebar
             filters={filterOptions}
@@ -110,15 +120,18 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
     return (
         <>
             <div className="container mx-auto flex flex-col md:flex-row gap-8 px-4 py-8">
-                {/* Sidebar for Desktop View */}
+                {/* Sidebar for Desktop */}
                 <aside className="hidden md:block w-full md:w-1/4 lg:w-1/5">
                     {sidebarContent}
                 </aside>
 
                 <main className="w-full md:w-3/4 lg:w-4/5">
                     <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-3xl font-bold">All Products</h1>
-                        {/* NEW: Filter Button for Mobile View */}
+                        <h1 className="text-3xl font-bold">
+                            {selectedCategories.length > 0
+                                ? `${selectedCategories[0]} Products`
+                                : "All Products"}
+                        </h1>
                         <button
                             onClick={() => setIsFilterOpen(true)}
                             className="md:hidden flex items-center gap-2 px-4 py-2 bg-white border rounded-md shadow-sm"
@@ -149,7 +162,6 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
 
             <ProductPreviewModal product={previewProduct} onClose={() => setPreviewProduct(null)} />
 
-            {/* NEW: Render the FilterModal for mobile, passing the sidebar as a child */}
             <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}>
                 {sidebarContent}
             </FilterModal>

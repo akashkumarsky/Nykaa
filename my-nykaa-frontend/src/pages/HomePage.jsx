@@ -178,8 +178,8 @@ const HomePage = ({ setPage, setSelectedProductId }) => {
             <CategoryCarousel
                 categories={categories}
                 onSelectCategory={(cat) => {
-                    console.log("Selected category:", cat);
-                    // TODO: redirect to filtered product page
+                    window.localStorage.setItem("selectedCategory", cat);
+                    setPage("products"); // ✅ matches App.jsx
                 }}
             />
 
