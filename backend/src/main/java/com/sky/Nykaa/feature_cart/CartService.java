@@ -1,3 +1,4 @@
+// src/main/java/com/sky/Nykaa/feature_cart/CartService.java
 package com.sky.Nykaa.feature_cart;
 
 import com.sky.Nykaa.common.exception.ResourceNotFoundException;
@@ -31,6 +32,18 @@ public class CartService {
 
     public CartDto addItemToCartAndMapToDto(String userEmail, AddItemRequest request) {
         Cart updatedCart = addItemToCart(userEmail, request);
+        return mapCartToDto(updatedCart);
+    }
+
+    // NEW: Public method for updating quantity
+    public CartDto updateItemQuantityAndMapToDto(String userEmail, Long cartItemId, int newQuantity) {
+        Cart updatedCart = updateItemQuantity(userEmail, cartItemId, newQuantity);
+        return mapCartToDto(updatedCart);
+    }
+
+    // NEW: Public method for removing an item
+    public CartDto removeItemFromCartAndMapToDto(String userEmail, Long cartItemId) {
+        Cart updatedCart = removeItemFromCart(userEmail, cartItemId);
         return mapCartToDto(updatedCart);
     }
 
@@ -68,6 +81,36 @@ public class CartService {
             cart.getCartItems().add(newItem);
         }
 
+        return cartRepository.save(cart);
+    }
+
+    /**
+     * NEW: Updates the quantity of a specific item in the user's cart.
+     */
+    @Transactional
+    private Cart updateItemQuantity(String userEmail, Long cartItemId, int newQuantity) {
+        Cart cart = getOrCreateCartForUser(userEmail);
+        CartItem item = cart.getCartItems().stream()
+                .filter(ci -> ci.getId().equals(cartItemId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found in user's cart"));
+
+        item.setQuantity(newQuantity);
+        return cartRepository.save(cart);
+    }
+
+    /**
+     * NEW: Removes an item completely from the user's cart.
+     */
+    @Transactional
+    private Cart removeItemFromCart(String userEmail, Long cartItemId) {
+        Cart cart = getOrCreateCartForUser(userEmail);
+        // The removeIf operation combined with orphanRemoval=true on the Cart entity
+        // will correctly delete the item from the database.
+        boolean removed = cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
+        if (!removed) {
+            throw new ResourceNotFoundException("Cart item not found in user's cart");
+        }
         return cartRepository.save(cart);
     }
 
