@@ -42,7 +42,7 @@ const AllProductsPage = ({ setPage, setSelectedProductId }) => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const params = new URLSearchParams({ page: currentPage, size: 12 });
+                const params = new URLSearchParams({ page: currentPage, size: 15 });
                 if (selectedCategories.length > 0) params.append('categories', selectedCategories.join(','));
                 if (selectedBrands.length > 0) params.append('brands', selectedBrands.join(','));
                 if (selectedPrice !== 'any') {

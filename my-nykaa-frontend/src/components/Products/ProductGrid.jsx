@@ -2,24 +2,24 @@
 import React from 'react';
 import ProductCard from '../ProductCard';
 
-// UPDATED: This component now accepts onPreview and onProductSelect as props
 const ProductGrid = ({ products, onPreview, onProductSelect }) => {
-    // Added a check to prevent errors if the products array is not available yet
+    // Handle empty or undefined products array
     if (!products || products.length === 0) {
-        return <div className="text-center py-12 text-gray-500">No products found.</div>;
+        return <div className="text-center py-16 text-gray-500">No products found.</div>;
     }
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map(product => (
-                // UPDATED: The props are now passed down to each ProductCard
-                <ProductCard
-                    key={product.id}
-                    product={product}
-                    onPreview={onPreview}
-                    onProductSelect={onProductSelect}
-                />
-            ))}
+        <div className="px-4 md:px-8 lg:px-16 py-8">
+            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                {products.map(product => (
+                    <ProductCard
+                        key={product.id}
+                        product={product}
+                        onPreview={onPreview}
+                        onProductSelect={onProductSelect}
+                    />
+                ))}
+            </div>
         </div>
     );
 };
