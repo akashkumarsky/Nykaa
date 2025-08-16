@@ -156,7 +156,7 @@ const CheckoutPage = ({ setPage }) => {
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Checkout</h1>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Address Form */}
         <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4 border-b pb-2">Shipping Address</h2>
@@ -175,7 +175,7 @@ const CheckoutPage = ({ setPage }) => {
               </select>
             </div>
           )}
-          
+
           <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-4">
             <input
               name="fullName"

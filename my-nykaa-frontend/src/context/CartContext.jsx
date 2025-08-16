@@ -3,12 +3,10 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '../api';
 
 const CartContext = createContext();
-
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children, user }) => {
     const [cart, setCart] = useState(null);
-    // UPDATED: Replaced 'loading' with 'loadingProductId' to track a specific item
     const [loadingProductId, setLoadingProductId] = useState(null);
     const [error, setError] = useState(null);
 
@@ -35,7 +33,6 @@ export const CartProvider = ({ children, user }) => {
             alert("Please log in to add items to your cart.");
             return;
         }
-        // UPDATED: Set the ID of the product that is currently being added
         setLoadingProductId(productId);
         try {
             const updatedCart = await api.post('/cart/items', { productId, quantity });
@@ -44,16 +41,29 @@ export const CartProvider = ({ children, user }) => {
             console.error("Failed to add item to cart:", err);
             setError(err.message);
         } finally {
-            // UPDATED: Clear the loading ID when the operation is complete
             setLoadingProductId(null);
         }
     };
 
+    const removeFromCart = (productId) => {
+        if (!cart) return;
+
+        // Remove item locally
+        const updatedCart = {
+            ...cart,
+            cartItems: cart.cartItems.filter(item => item.product.id !== productId)
+        };
+
+        setCart(updatedCart);
+    };
+
+
     const value = {
         cart,
         addToCart,
+        removeFromCart, // add it to context
         fetchCart,
-        loadingProductId, // Pass down the specific ID
+        loadingProductId,
         error,
         itemCount: cart?.cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0
     };
