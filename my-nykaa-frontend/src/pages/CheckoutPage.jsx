@@ -164,19 +164,30 @@ const CheckoutPage = ({ setPage }) => {
           <h2 className="text-2xl font-semibold mb-6 text-gray-800">📦 Shipping Address</h2>
           {savedAddresses.length > 0 && (
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-600">Choose a saved address</label>
-              <select
-                value={selectedAddress}
-                onChange={handleAddressSelect}
-                className="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
-              >
-                {savedAddresses.map((addr, index) => (
-                  <option key={index} value={addr}>{addr}</option>
-                ))}
-                <option value="new">➕ Add a New Address</option>
-              </select>
+              <label className="block text-sm font-medium text-gray-600 mb-2">
+                Choose a saved address
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedAddress}
+                  onChange={handleAddressSelect}
+                  className="appearance-none w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-700 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all cursor-pointer"
+                >
+                  {savedAddresses.map((addr, index) => (
+                    <option key={index} value={addr}>
+                      {addr}
+                    </option>
+                  ))}
+                  <option value="new">➕ Add a New Address</option>
+                </select>
+                {/* Custom dropdown arrow */}
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                  ▼
+                </span>
+              </div>
             </div>
           )}
+
 
           <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-5">
             <input
