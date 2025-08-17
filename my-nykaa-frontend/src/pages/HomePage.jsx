@@ -142,12 +142,7 @@ const HomePage = ({ setPage, setSelectedProductId }) => {
             try {
                 const data = await api.get('/products/categories');
                 if (data) {
-                    // Manually add image URLs to categories
-                    const categoriesWithImages = data.map((category) => ({
-                        ...category,
-                        image: `https://source.unsplash.com/150x150/?${category.name}`, // Example image
-                    }));
-                    setCategories(categoriesWithImages);
+                    setCategories(data);
                 }
             } catch (err) {
                 console.error("Failed to fetch categories:", err);
