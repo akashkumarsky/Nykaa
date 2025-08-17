@@ -6,6 +6,8 @@ const AdminOrders = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const orderStatuses = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+
     useEffect(() => {
         const fetchOrders = async () => {
             try {
@@ -23,6 +25,16 @@ const AdminOrders = () => {
 
         fetchOrders();
     }, []);
+
+    const handleStatusChange = async (orderId, newStatus) => {
+        try {
+            const updatedOrder = await api.put(`/orders/${orderId}/status`, newStatus);
+            setOrders(orders.map(order => order.id === orderId ? updatedOrder : order));
+        } catch (err) {
+            console.error("Failed to update order status:", err);
+            // Optionally, show an error message to the user
+        }
+    };
 
     if (loading) {
         return <div>Loading orders...</div>;
@@ -57,9 +69,15 @@ const AdminOrders = () => {
                                     <td className="py-2 px-4 border-b text-center">${order.totalAmount.toFixed(2)}</td>
                                     <td className="py-2 px-4 border-b text-center">{order.status}</td>
                                     <td className="py-2 px-4 border-b text-center">
-                                        <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600">
-                                            View Details
-                                        </button>
+                                        <select
+                                            value={order.status}
+                                            onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                                            className="p-2 border rounded"
+                                        >
+                                            {orderStatuses.map(status => (
+                                                <option key={status} value={status}>{status}</option>
+                                            ))}
+                                        </select>
                                     </td>
                                 </tr>
                             ))

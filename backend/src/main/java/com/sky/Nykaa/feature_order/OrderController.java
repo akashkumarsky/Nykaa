@@ -47,6 +47,13 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @PutMapping("/{orderId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OrderDto> updateOrderStatus(@PathVariable Long orderId, @RequestBody String status) {
+        OrderDto updatedOrder = orderService.updateOrderStatus(orderId, status);
+        return ResponseEntity.ok(updatedOrder);
+    }
+
     /**
      * Handles GET requests to fetch a user's saved shipping addresses.
      */
