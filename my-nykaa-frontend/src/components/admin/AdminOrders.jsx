@@ -28,13 +28,13 @@ const AdminOrders = () => {
 
     const handleStatusChange = async (orderId, newStatus) => {
         try {
-            const updatedOrder = await api.put(`/orders/${orderId}/status`, newStatus);
+            const updatedOrder = await api.put(`/orders/${orderId}/status`, { status: newStatus });
             setOrders(orders.map(order => order.id === orderId ? updatedOrder : order));
         } catch (err) {
             console.error("Failed to update order status:", err);
-            // Optionally, show an error message to the user
         }
     };
+
 
     if (loading) {
         return <div>Loading orders...</div>;
