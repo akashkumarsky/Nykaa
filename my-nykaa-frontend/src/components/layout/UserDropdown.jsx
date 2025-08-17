@@ -43,6 +43,14 @@ const UserDropdown = ({ user, onLogout, setPage }) => {
                     >
                         My Orders
                     </button>
+                    {user.role === 'ROLE_ADMIN' && (
+                        <button
+                            onClick={() => handleNavigation('admin')}
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                            Admin Panel
+                        </button>
+                    )}
                     <button
                         onClick={onLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

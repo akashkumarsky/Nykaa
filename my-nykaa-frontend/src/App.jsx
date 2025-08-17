@@ -16,6 +16,7 @@ import AllProductsPage from './pages/AllProductsPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
 import ProductDetailPage from './pages/ProductDetailPage.jsx';
 import OrderHistoryPage from './pages/OrderHistoryPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 
 function App() {
     const [page, setPage] = useState('home');
@@ -60,6 +61,8 @@ function App() {
                 return <ProductDetailPage productId={selectedProductId} setPage={setPage} />;
             case 'orders':
                 return <OrderHistoryPage />;
+            case 'admin':
+                return <AdminPage />;
             case 'home':
             default:
                 return <HomePage setPage={setPage} setSelectedProductId={setSelectedProductId} />;
