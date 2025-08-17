@@ -13,7 +13,8 @@ const AdminOrders = () => {
             try {
                 setLoading(true);
                 const data = await api.get('/orders/all');
-                setOrders(data);
+                const sortedOrders = data.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+                setOrders(sortedOrders);
                 setError(null);
             } catch (err) {
                 setError(err.message);
