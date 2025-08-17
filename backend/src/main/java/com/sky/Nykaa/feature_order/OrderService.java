@@ -104,6 +104,13 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public List<OrderDto> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream()
+                .map(this::mapEntityToDto)
+                .collect(Collectors.toList());
+    }
+
     private OrderDto mapEntityToDto(Order order) {
         OrderDto orderDto = new OrderDto();
         orderDto.setId(order.getId());
