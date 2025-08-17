@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { api } from '../../api';
+import React, { useState, useEffect } from "react";
+import { api } from "../../api";
+import Pagination from "../ui/Pagination";
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [usersPerPage] = useState(12);
 
-    const userRoles = ['ROLE_USER', 'ROLE_ADMIN'];
+    const userRoles = ["ROLE_USER", "ROLE_ADMIN"];
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 setLoading(true);
-                const data = await api.get('/users');
+                const data = await api.get("/users");
                 const sortedUsers = data.sort((a, b) => b.id - a.id);
                 setUsers(sortedUsers);
                 setError(null);
@@ -29,64 +32,134 @@ const AdminUsers = () => {
 
     const handleRoleChange = async (userId, newRole) => {
         try {
-            const updatedUser = await api.put(`/users/${userId}/role`, { role: newRole });
-            setUsers(users.map(user => user.id === userId ? updatedUser : user));
+            const updatedUser = await api.put(`/users/${userId}/role`, {
+                role: newRole,
+            });
+            setUsers(users.map((user) => (user.id === userId ? updatedUser : user)));
         } catch (err) {
             console.error("Failed to update user role:", err);
         }
     };
 
+    const getRoleClasses = (role) => {
+        return role === 'ROLE_ADMIN'
+            ? 'bg-green-100 text-green-800'
+            : 'bg-purple-100 text-purple-800';
+    };
+
+    // Pagination Logic
+    const indexOfFirstUser = currentPage * usersPerPage;
+    const indexOfLastUser = indexOfFirstUser + usersPerPage;
+    const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+    const totalPages = Math.ceil(users.length / usersPerPage);
+
     if (loading) {
-        return <div>Loading users...</div>;
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            </div>
+        );
     }
 
     if (error) {
-        return <div className="text-red-500">Error: {error}</div>;
+        return (
+            <div className="text-center py-10 bg-red-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-red-700">An Error Occurred</h3>
+                <p className="text-red-600">{error}</p>
+            </div>
+        );
     }
 
     return (
-        <div>
-            <h2 className="text-xl font-bold mb-4">Manage Users</h2>
-            <div className="overflow-x-auto">
-                <table className="min-w-full bg-white">
-                    <thead>
+        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+                <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
+            </div>
+
+            {/* Table View (for medium screens and up) */}
+            <div className="hidden md:block overflow-x-auto shadow rounded-lg bg-white">
+                <table className="min-w-full">
+                    <thead className="bg-blue-500 text-white">
                         <tr>
-                            <th className="py-2 px-4 border-b">User ID</th>
-                            <th className="py-2 px-4 border-b">Name</th>
-                            <th className="py-2 px-4 border-b">Email</th>
-                            <th className="py-2 px-4 border-b">Role</th>
-                            <th className="py-2 px-4 border-b">Actions</th>
+                            <th className="py-3 px-4 text-left">User ID</th>
+                            <th className="py-3 px-4 text-left">Name</th>
+                            <th className="py-3 px-4 text-left">Email</th>
+                            <th className="py-3 px-4 text-center">Role</th>
+                            <th className="py-3 px-4 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {users.length > 0 ? (
-                            users.map((user) => (
-                                <tr key={user.id}>
-                                    <td className="py-2 px-4 border-b text-center">{user.id}</td>
-                                    <td className="py-2 px-4 border-b text-center">{`${user.firstName} ${user.lastName}`}</td>
-                                    <td className="py-2 px-4 border-b text-center">{user.email}</td>
-                                    <td className="py-2 px-4 border-b text-center">{user.role}</td>
-                                    <td className="py-2 px-4 border-b text-center">
-                                        <select
-                                            value={user.role}
-                                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                            className="p-2 border rounded"
-                                        >
-                                            {userRoles.map(role => (
-                                                <option key={role} value={role}>{role}</option>
-                                            ))}
-                                        </select>
+                        {currentUsers.length > 0 ? (
+                            currentUsers.map((user, index) => (
+                                <tr key={user.id} className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                                    <td className="py-3 px-4 font-medium">#{user.id}</td>
+                                    <td className="py-3 px-4">{`${user.firstName} ${user.lastName}`}</td>
+                                    <td className="py-3 px-4">{user.email}</td>
+                                    <td className="py-3 px-4 text-center">
+                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleClasses(user.role)}`}>
+                                            {user.role.replace('ROLE_', '')}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4 text-center">
+                                        <div className="relative inline-block max-w-[10rem] w-full">
+                                            <select
+                                                value={user.role}
+                                                onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white truncate"
+                                            >
+                                                {userRoles.map((role) => (
+                                                    <option key={role} value={role}>{role.replace('ROLE_', '')}</option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="py-4 px-4 border-b text-center">No users found.</td>
+                                <td colSpan="5" className="py-6 text-center text-gray-500 italic">No users found.</td>
                             </tr>
                         )}
                     </tbody>
                 </table>
             </div>
+
+            {/* Card View (for small screens) */}
+            <div className="grid gap-4 md:hidden">
+                {currentUsers.map((user) => (
+                    <div key={user.id} className="bg-white shadow rounded-lg p-4 border flex flex-col">
+                        <div className="flex justify-between items-start mb-2">
+                            <div>
+                                <p className="font-semibold text-lg">{`${user.firstName} ${user.lastName}`}</p>
+                                <p className="text-sm text-gray-500">ID: {user.id}</p>
+                            </div>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleClasses(user.role)}`}>
+                                {user.role.replace('ROLE_', '')}
+                            </span>
+                        </div>
+                        <p className="text-gray-600">{user.email}</p>
+                        <div className="mt-auto pt-3">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Update Role</label>
+                            <div className="relative w-full max-w-full">
+                                <select
+                                    value={user.role}
+                                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white truncate"
+                                >
+                                    {userRoles.map((role) => (
+                                        <option key={role} value={role}>{role.replace('ROLE_', '')}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
     );
 };
