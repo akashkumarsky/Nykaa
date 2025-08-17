@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { api } from '../api';
+import OrderSummary from '../components/checkout/OrderSummary.jsx'; // Corrected import path
 
 const CheckoutPage = ({ setPage }) => {
-  const { cart, itemCount, fetchCart } = useCart();
+  const { cart, fetchCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -50,6 +51,7 @@ const CheckoutPage = ({ setPage }) => {
     }
   };
 
+  // Calculation is kept here as it's needed for payment processing logic
   const subtotal = cart?.cartItems?.reduce((sum, item) => sum + item.product.price * item.quantity, 0) || 0;
   const shippingCost = subtotal > 500 ? 0 : 50;
   const total = subtotal + shippingCost;
@@ -100,6 +102,7 @@ const CheckoutPage = ({ setPage }) => {
       const loaded = await loadRazorpayScript();
       if (!loaded) {
         setError("Failed to load Razorpay SDK");
+        setLoading(false); // Stop loading if SDK fails
         return;
       }
 
@@ -219,32 +222,8 @@ const CheckoutPage = ({ setPage }) => {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-white p-6 rounded-lg shadow h-fit">
-          <h2 className="text-xl font-semibold mb-4 border-b pb-2">Order Summary</h2>
-          <div className="space-y-2 text-gray-600">
-            <div className="flex justify-between">
-              <span>Subtotal ({itemCount} items)</span>
-              <span>₹{subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>₹{shippingCost.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-bold text-lg border-t pt-2">
-              <span>Total</span>
-              <span>₹{total.toFixed(2)}</span>
-            </div>
-          </div>
-          {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-          <button
-            type="submit"
-            form="checkout-form"
-            disabled={loading || itemCount === 0}
-            className="w-full mt-6 bg-pink-500 text-white font-bold py-3 rounded-md hover:bg-pink-600 disabled:bg-pink-300"
-          >
-            {loading ? 'Processing...' : 'Place Order'}
-          </button>
-        </div>
+        <OrderSummary loading={loading} error={error} />
+
       </div>
     </div>
   );

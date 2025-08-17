@@ -23,7 +23,8 @@ const OrderSummary = ({ loading, error }) => {
                     <span>Shipping</span>
                     <span>₹{shippingCost.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-lg text-gray-800 border-t pt-2 mt-2">
+                {/* Updated this line as requested */}
+                <div className="flex justify-between font-bold text-lg border-t pt-2">
                     <span>Total</span>
                     <span>₹{total.toFixed(2)}</span>
                 </div>
@@ -35,7 +36,8 @@ const OrderSummary = ({ loading, error }) => {
                 disabled={loading || itemCount === 0}
                 className="w-full mt-6 bg-pink-500 text-white font-bold py-3 rounded-md hover:bg-pink-600 disabled:bg-pink-300"
             >
-                {loading ? 'Placing Order...' : 'Place Order'}
+                {/* Updated loading text */}
+                {loading ? 'Processing...' : 'Place Order'}
             </button>
         </div>
     );
