@@ -4,10 +4,10 @@ const fetchWithAuth = async (endpoint, options = {}) => {
     const storedUser = localStorage.getItem('nykaaUser');
     const token = storedUser ? JSON.parse(storedUser).jwtToken : null;
 
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers,
-    };
+    const headers = { ...options.headers };
+    if (options.method === 'POST' || options.method === 'PUT') {
+        headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;

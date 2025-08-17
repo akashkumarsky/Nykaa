@@ -9,22 +9,29 @@ const FilterSection = ({ title, options, selected, onChange, type = 'checkbox' }
             <ChevronDown className="h-5 w-5 transition-transform details-open:rotate-180" />
         </summary>
         <ul className="pt-2 space-y-1">
-            {options.map(option => (
-                <li key={option.value || option} className="flex items-center">
-                    <input
-                        type={type}
-                        id={`${title}-${option.value || option}`}
-                        name={title} // Name is important for radio buttons
-                        value={option.value || option}
-                        checked={selected.includes(option.value || option)}
-                        onChange={() => onChange(option.value || option)}
-                        className={`h-4 w-4 border-pink-300 text-black-600 focus:ring-pink-500 ${type === 'radio' ? 'rounded-full' : 'rounded'}`}
-                    />
-                    <label htmlFor={`${title}-${option.value || option}`} className="ml-3 text-sm text-black-800">
-                        {option.label || option}
-                    </label>
-                </li>
-            ))}
+            {options.map(option => {
+                const isObject = typeof option === 'object' && option !== null;
+                const key = isObject ? option.id || option.value || option.name : option;
+                const value = isObject ? option.value || option.name : option;
+                const label = isObject ? option.label || option.name : option;
+
+                return (
+                    <li key={key} className="flex items-center">
+                        <input
+                            type={type}
+                            id={`${title}-${value}`}
+                            name={title}
+                            value={value}
+                            checked={selected.includes(value)}
+                            onChange={() => onChange(value)}
+                            className={`h-4 w-4 border-pink-300 text-black-600 focus:ring-pink-500 ${type === 'radio' ? 'rounded-full' : 'rounded'}`}
+                        />
+                        <label htmlFor={`${title}-${value}`} className="ml-3 text-sm text-black-800">
+                            {label}
+                        </label>
+                    </li>
+                );
+            })}
         </ul>
     </details>
 );

@@ -12,12 +12,18 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.sky.Nykaa.feature_cart.CartItemRepository;
+import com.sky.Nykaa.feature_order.OrderItemRepository;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class ProductService {
 
     @Autowired private ProductRepository productRepository;
     @Autowired private CategoryRepository categoryRepository;
     @Autowired private BrandRepository brandRepository;
+    @Autowired private CartItemRepository cartItemRepository;
+    @Autowired private OrderItemRepository orderItemRepository;
 
     /**
      * UPDATED: Method now accepts minPrice and maxPrice for filtering.
@@ -50,17 +56,49 @@ public class ProductService {
         product.setStockQuantity(request.getStockQuantity());
         product.setCategory(category);
         product.setBrand(brand);
+        product.setCreatedAt(java.time.LocalDateTime.now());
 
         Product savedProduct = productRepository.save(product);
         return mapEntityToDto(savedProduct);
     }
 
-    public List<String> getAllCategoryNames() {
-        return categoryRepository.findAllCategoryNames();
+    public List<Category> getAllCategories() {
+        return categoryRepository.findAll();
     }
 
-    public List<String> getAllBrandNames() {
-        return brandRepository.findAllBrandNames();
+    public List<Brand> getAllBrands() {
+        return brandRepository.findAll();
+    }
+
+    @Transactional
+    public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with id: " + id);
+        }
+        cartItemRepository.deleteByProductId(id);
+        orderItemRepository.deleteByProductId(id);
+        productRepository.deleteById(id);
+    }
+
+    public ProductDto updateProduct(Long id, CreateProductRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + request.getCategoryId()));
+        Brand brand = brandRepository.findById(request.getBrandId())
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + request.getBrandId()));
+
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setImageUrl(request.getImageUrl());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setCategory(category);
+        product.setBrand(brand);
+
+        Product updatedProduct = productRepository.save(product);
+        return mapEntityToDto(updatedProduct);
     }
 
     private ProductDto mapEntityToDto(Product product) {

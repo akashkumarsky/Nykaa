@@ -20,6 +20,9 @@ public class Category {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column
+    private String image;
+
     @OneToMany(mappedBy = "category")
     @JsonManagedReference("product-category") // Named managed reference
     private Set<Product> products;

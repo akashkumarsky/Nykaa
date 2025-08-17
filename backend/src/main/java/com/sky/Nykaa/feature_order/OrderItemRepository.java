@@ -1,13 +1,13 @@
-package com.sky.Nykaa.feature_cart;
+package com.sky.Nykaa.feature_order;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface CartItemRepository extends JpaRepository<CartItem,Long> {
+public interface OrderItemRepository extends JpaRepository<OrderItem,Long> {
     @Modifying
     @Transactional
-    @Query("DELETE FROM CartItem ci WHERE ci.product.id = :productId")
+    @Query("DELETE FROM OrderItem oi WHERE oi.product.id = :productId")
     void deleteByProductId(Long productId);
 }

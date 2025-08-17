@@ -135,6 +135,26 @@ const ProductSection = ({ onPreview, onProductSelect }) => {
 // ✅ Main HomePage
 const HomePage = ({ setPage, setSelectedProductId }) => {
     const [previewProduct, setPreviewProduct] = useState(null);
+    const [categories, setCategories] = useState([]);
+
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await api.get('/products/categories');
+                if (data) {
+                    // Manually add image URLs to categories
+                    const categoriesWithImages = data.map((category) => ({
+                        ...category,
+                        image: `https://source.unsplash.com/150x150/?${category.name}`, // Example image
+                    }));
+                    setCategories(categoriesWithImages);
+                }
+            } catch (err) {
+                console.error("Failed to fetch categories:", err);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     const handleProductSelect = (id) => {
         setSelectedProductId(id);
@@ -146,25 +166,6 @@ const HomePage = ({ setPage, setSelectedProductId }) => {
         'https://images-static.nykaa.com/uploads/3857fb95-8ca8-4769-8877-0a67c677888f.jpeg?tr=cm-pad_resize,w-1200',
         'https://images-static.nykaa.com/uploads/1f48e067-4588-4ee1-83db-947e1ee69bd2.png?tr=cm-pad_resize,w-1200',
         'https://images-static.nykaa.com/uploads/26b5bd30-e525-4a61-9228-374756ee0664.jpg?tr=cm-pad_resize,w-1200',
-    ];
-
-    // Categories
-    const categories = [
-        { name: 'Lipstick', image: 'https://images-static.nykaa.com/uploads/f24fedce-131d-4475-8abe-2fd521f9f285.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Foundation', image: 'https://images-static.nykaa.com/uploads/6190197e-b6eb-4940-bfb6-24798c324ee1.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Compact', image: 'https://images-static.nykaa.com/uploads/ec49b021-8e66-4dd0-80c0-4b9bad94d756.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Concealer', image: 'https://images-static.nykaa.com/uploads/5485d6ba-2ba0-47bb-964e-3222a69919c2.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Eyeliner', image: 'https://images-static.nykaa.com/uploads/033bc735-50f3-42df-9b7b-08a41fd43902.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Kajal', image: 'https://images-static.nykaa.com/uploads/f0952518-e7af-41c1-940d-770d8bce6c48.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Blush', image: 'https://images-static.nykaa.com/uploads/d7927b17-b7a8-4c57-bde5-d6f3eb3ebd04.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Face Primer', image: 'https://images-static.nykaa.com/uploads/7625ce90-e0fe-4385-948c-82f8efbc00b6.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Setting Spray', image: 'https://images-static.nykaa.com/uploads/013441fd-3566-49a2-9c31-7952e8536778.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Eyeshadow', image: 'https://images-static.nykaa.com/uploads/e33c5912-3056-4be4-84ab-bca828fff41f.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Mascara', image: 'https://images-static.nykaa.com/uploads/b50ea736-1006-44fa-bf7d-167abd0c1650.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Eyebrow Enhancer', image: 'https://images-static.nykaa.com/uploads/a06e37f1-f1fd-4150-92ac-d0de4778b4f5.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Nail polish', image: 'https://images-static.nykaa.com/uploads/f2f1c795-61d6-4667-9e9c-de05baae0e0c.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'Tool & Brushes', image: 'https://images-static.nykaa.com/uploads/288a4d54-1690-47cd-93a8-96a0968aff49.jpg?tr=cm-pad_resize,w-150' },
-        { name: 'New & Viral', image: 'https://images-static.nykaa.com/uploads/f74b232e-72b6-493d-80e4-65c264c1980d.jpg?tr=cm-pad_resize,w-150' },
     ];
 
     return (

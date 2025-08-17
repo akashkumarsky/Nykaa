@@ -62,15 +62,35 @@ public class ProductController {
      * Handles GET requests to fetch all unique category names for the filter sidebar.
      */
     @GetMapping("/categories")
-    public ResponseEntity<List<String>> getAllCategories() {
-        return ResponseEntity.ok(productService.getAllCategoryNames());
+    public ResponseEntity<List<Category>> getAllCategories() {
+        return ResponseEntity.ok(productService.getAllCategories());
     }
 
     /**
      * Handles GET requests to fetch all unique brand names for the filter sidebar.
      */
     @GetMapping("/brands")
-    public ResponseEntity<List<String>> getAllBrands() {
-        return ResponseEntity.ok(productService.getAllBrandNames());
+    public ResponseEntity<List<Brand>> getAllBrands() {
+        return ResponseEntity.ok(productService.getAllBrands());
+    }
+
+    /**
+     * Handles DELETE requests to remove a product by its ID. (Admin only)
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Handles PUT requests to update an existing product. (Admin only)
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @Valid @RequestBody CreateProductRequest request) {
+        ProductDto updatedProduct = productService.updateProduct(id, request);
+        return ResponseEntity.ok(updatedProduct);
     }
 }
