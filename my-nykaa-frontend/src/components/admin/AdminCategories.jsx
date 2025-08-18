@@ -8,6 +8,7 @@ const AdminCategories = () => {
     const [editingCategory, setEditingCategory] = useState(null);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newCategoryImage, setNewCategoryImage] = useState('');
+    const [formError, setFormError] = useState('');
 
     useEffect(() => {
         fetchCategories();
@@ -28,6 +29,15 @@ const AdminCategories = () => {
 
     const handleCreate = async (e) => {
         e.preventDefault();
+        setFormError('');
+        if (newCategoryName.length > 255) {
+            setFormError('Category name cannot exceed 255 characters.');
+            return;
+        }
+        if (newCategoryImage.length > 2048) {
+            setFormError('Image URL cannot exceed 2048 characters.');
+            return;
+        }
         try {
             await api.createCategory({ name: newCategoryName, image: newCategoryImage });
             setNewCategoryName('');
@@ -39,6 +49,14 @@ const AdminCategories = () => {
     };
 
     const handleUpdate = async (id) => {
+        if (editingCategory.name.length > 255) {
+            setError('Category name cannot exceed 255 characters.');
+            return;
+        }
+        if (editingCategory.image.length > 2048) {
+            setError('Image URL cannot exceed 2048 characters.');
+            return;
+        }
         try {
             await api.updateCategory(id, { name: editingCategory.name, image: editingCategory.image });
             setEditingCategory(null);
@@ -74,6 +92,7 @@ const AdminCategories = () => {
 
             <form onSubmit={handleCreate} className="mb-6 p-4 border rounded shadow-md">
                 <h3 className="text-xl font-semibold mb-2">Add New Category</h3>
+                {formError && <div className="text-red-500 mb-4">{formError}</div>}
                 <div className="flex flex-col md:flex-row gap-4">
                     <input
                         type="text"

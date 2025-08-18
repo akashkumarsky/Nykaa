@@ -8,6 +8,7 @@ const AdminBrands = () => {
   const [editingBrand, setEditingBrand] = useState(null);
   const [newBrandName, setNewBrandName] = useState('');
   const [newBrandImage, setNewBrandImage] = useState('');
+  const [formError, setFormError] = useState('');
 
   const fetchBrands = async () => {
     setIsLoading(true);
@@ -27,6 +28,15 @@ const AdminBrands = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
+    setFormError('');
+    if (newBrandName.length > 255) {
+        setFormError('Brand name cannot exceed 255 characters.');
+        return;
+    }
+    if (newBrandImage.length > 2048) {
+        setFormError('Image URL cannot exceed 2048 characters.');
+        return;
+    }
     if (!newBrandName.trim()) return;
     try {
       await api.createBrand({ name: newBrandName, image: newBrandImage });
@@ -39,6 +49,14 @@ const AdminBrands = () => {
   };
 
   const handleUpdate = async (id) => {
+    if (editingBrand.name.length > 255) {
+        setError('Brand name cannot exceed 255 characters.');
+        return;
+    }
+    if (editingBrand.image.length > 2048) {
+        setError('Image URL cannot exceed 2048 characters.');
+        return;
+    }
     try {
       await api.updateBrand(id, {
         name: editingBrand.name,
@@ -77,6 +95,7 @@ const AdminBrands = () => {
 
       <form onSubmit={handleCreate} className="mb-6 p-4 border rounded shadow-md">
         <h3 className="text-xl font-semibold mb-2">Add New Brand</h3>
+        {formError && <div className="text-red-500 mb-4">{formError}</div>}
         <div className="flex flex-col md:flex-row gap-4">
           <input
             type="text"
