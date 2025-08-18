@@ -60,7 +60,7 @@ function App() {
             case 'productDetail':
                 return <ProductDetailPage productId={selectedProductId} setPage={setPage} />;
             case 'orders':
-                return <OrderHistoryPage />;
+                return <OrderHistoryPage setPage={setPage} />;
             case 'admin':
                 return <AdminPage />;
             case 'home':
@@ -79,9 +79,9 @@ function App() {
                     onCartClick={() => setIsCartOpen(true)}
                     onMenuClick={() => setIsMenuOpen(true)}
                 />
-                <CartSidebar 
-                    isOpen={isCartOpen} 
-                    onClose={() => setIsCartOpen(false)} 
+                <CartSidebar
+                    isOpen={isCartOpen}
+                    onClose={() => setIsCartOpen(false)}
                     setPage={setPage}
                 />
                 <MobileMenu

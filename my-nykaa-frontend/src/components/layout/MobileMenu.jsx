@@ -1,3 +1,4 @@
+// src/components/layout/MobileMenu.jsx
 import React from 'react';
 import { X } from 'lucide-react';
 
@@ -15,6 +16,7 @@ const MobileMenu = ({ isOpen, onClose, setPage, user, onLogout }) => {
                     }`}
                 onClick={onClose}
             ></div>
+
             {/* Menu */}
             <div
                 className={`fixed top-0 left-0 h-full w-4/5 max-w-sm bg-white shadow-xl transform transition-transform z-50 lg:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -26,15 +28,31 @@ const MobileMenu = ({ isOpen, onClose, setPage, user, onLogout }) => {
                         <X size={24} />
                     </button>
                 </div>
+
                 <nav className="flex flex-col p-4 space-y-4 text-gray-700 font-semibold">
                     <button onClick={() => handleNavigation('products')} className="text-left">All Products</button>
-                    {/* UPDATED: "My Orders" link is now included and only shows if a user is logged in */}
+
                     {user && (
-                        <button onClick={() => handleNavigation('orders')} className="text-left">My Orders</button>
+                        <>
+                            <button onClick={() => handleNavigation('orders')} className="text-left">My Orders</button>
+
+                            {/* ✅ Show Admin Panel if user is admin */}
+                            {user.role === 'ROLE_ADMIN' && (
+                                <button
+                                    onClick={() => handleNavigation('admin')}
+                                    className="text-left bg-pink-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-pink-600 transition"
+                                >
+                                    Admin Panel
+                                </button>
+                            )}
+
+                        </>
                     )}
+
                     <a href="#" className="text-left">Brands</a>
                     <a href="#" className="text-left">Luxe</a>
                 </nav>
+
                 <div className="mt-auto p-4 border-t">
                     {user ? (
                         <div className="flex items-center justify-between">
@@ -42,7 +60,10 @@ const MobileMenu = ({ isOpen, onClose, setPage, user, onLogout }) => {
                             <button onClick={onLogout} className="font-semibold text-pink-500">Logout</button>
                         </div>
                     ) : (
-                        <button onClick={() => handleNavigation('login')} className="w-full bg-pink-500 text-white font-bold py-2 rounded-md">
+                        <button
+                            onClick={() => handleNavigation('login')}
+                            className="w-full bg-pink-500 text-white font-bold py-2 rounded-md"
+                        >
                             Sign In
                         </button>
                     )}

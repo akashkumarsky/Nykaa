@@ -1,3 +1,4 @@
+// src/pages/CheckoutPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { api } from '../api';
@@ -9,10 +10,13 @@ const CheckoutPage = ({ setPage }) => {
   const [error, setError] = useState(null);
   const [orderPlaced, setOrderPlaced] = useState(false);
 
-  const [address, setAddress] = useState({ fullName: '', street: '', city: '', zip: '' });
+  // ✅ address now includes phone
+  const [address, setAddress] = useState({ fullName: '', street: '', city: '', zip: '', phone: '' });
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState('new');
+  const [errors, setErrors] = useState({});
 
+  // inside useEffect -> fetchAddresses
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -20,9 +24,24 @@ const CheckoutPage = ({ setPage }) => {
         if (data?.length > 0) {
           setSavedAddresses(data);
           setSelectedAddress(data[0]);
+
           const parts = data[0].split(', ');
           if (parts.length === 4) {
-            setAddress({ fullName: parts[0], street: parts[1], city: parts[2], zip: parts[3] });
+            setAddress({
+              fullName: parts[0],
+              street: parts[1],
+              city: parts[2],
+              zip: parts[3],
+              phone: ''   // backward compatibility
+            });
+          } else if (parts.length === 5) {
+            setAddress({
+              fullName: parts[0],
+              street: parts[1],
+              city: parts[2],
+              zip: parts[3],
+              phone: parts[4]
+            });
           }
         }
       } catch (err) {
@@ -32,39 +51,76 @@ const CheckoutPage = ({ setPage }) => {
     fetchAddresses();
   }, []);
 
+  // inside handleAddressSelect
+  const handleAddressSelect = (e) => {
+    const value = e.target.value;
+    setSelectedAddress(value);
+
+    if (value !== 'new') {
+      const parts = value.split(', ');
+      if (parts.length === 4) {
+        setAddress({
+          fullName: parts[0],
+          street: parts[1],
+          city: parts[2],
+          zip: parts[3],
+          phone: ''
+        });
+      } else if (parts.length === 5) {
+        setAddress({
+          fullName: parts[0],
+          street: parts[1],
+          city: parts[2],
+          zip: parts[3],
+          phone: parts[4]
+        });
+      }
+    } else {
+      setAddress({ fullName: '', street: '', city: '', zip: '', phone: '' });
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAddress(prev => ({ ...prev, [name]: value }));
     setSelectedAddress('new');
   };
 
-  const handleAddressSelect = (e) => {
-    const value = e.target.value;
-    setSelectedAddress(value);
-    if (value !== 'new') {
-      const parts = value.split(', ');
-      if (parts.length === 4) {
-        setAddress({ fullName: parts[0], street: parts[1], city: parts[2], zip: parts[3] });
-      }
-    } else {
-      setAddress({ fullName: '', street: '', city: '', zip: '' });
+
+
+  // ✅ Validation rules
+  const validateFields = () => {
+    let newErrors = {};
+
+    if (!/^[a-zA-Z\s]+$/.test(address.fullName.trim())) {
+      newErrors.fullName = "Name must contain only letters and spaces";
     }
+    if (!/^[a-zA-Z0-9\s,.-]+$/.test(address.street.trim())) {
+      newErrors.street = "Street must contain only letters, numbers, , . -";
+    }
+    if (!/^[a-zA-Z\s]+$/.test(address.city.trim())) {
+      newErrors.city = "City must contain only letters";
+    }
+    if (!/^\d{5,6}$/.test(address.zip.trim())) {
+      newErrors.zip = "ZIP code must be 5–6 digits";
+    }
+    if (!/^[6-9]\d{9}$/.test(address.phone.trim())) {
+      newErrors.phone = "Phone must be a valid 10-digit number starting with 6-9";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-
-
+  // Subtotal, GST & Shipping
   const subtotal = cart?.cartItems?.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
   ) || 0;
 
   const shippingCost = subtotal > 500 ? 0 : 50;
-
-  // GST (18%)
   const gstRate = 0.18;
   const gst = subtotal * gstRate;
-
-  // ✅ Correct total with GST + shipping
   const total = subtotal + gst + shippingCost;
 
   const loadRazorpayScript = () => {
@@ -88,17 +144,13 @@ const CheckoutPage = ({ setPage }) => {
       return;
     }
 
-    if (selectedAddress === 'new') {
-      const { fullName, street, city, zip } = address;
-      if (!fullName.trim() || !street.trim() || !city.trim() || !zip.trim()) {
-        setError("Please fill out all address fields.");
-        return;
-      }
+    if (selectedAddress === 'new' && !validateFields()) {
+      return;
     }
 
     const shippingAddress = selectedAddress !== 'new'
       ? selectedAddress
-      : `${address.fullName}, ${address.street}, ${address.city}, ${address.zip}`;
+      : `${address.fullName}, ${address.street}, ${address.city}, ${address.zip}, ${address.phone}`;
 
     try {
       setLoading(true);
@@ -108,7 +160,6 @@ const CheckoutPage = ({ setPage }) => {
         productId: item.product.id,
         quantity: item.quantity
       }));
-
 
       const paymentOrder = await api.post("/payment/create-order", { amount: total });
 
@@ -186,7 +237,7 @@ const CheckoutPage = ({ setPage }) => {
                 <select
                   value={selectedAddress}
                   onChange={handleAddressSelect}
-                  className="appearance-none w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-700 font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all cursor-pointer"
+                  className="appearance-none w-full px-4 py-3 rounded-xl border border-gray-300 bg-gray-50 text-gray-700 font-medium shadow-sm focus:ring-2 focus:ring-pink-500 cursor-pointer"
                 >
                   {savedAddresses.map((addr, index) => (
                     <option key={index} value={addr}>
@@ -195,60 +246,89 @@ const CheckoutPage = ({ setPage }) => {
                   ))}
                   <option value="new">➕ Add a New Address</option>
                 </select>
-                {/* Custom dropdown arrow */}
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                  ▼
-                </span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">▼</span>
               </div>
             </div>
           )}
 
-
+          {/* Form */}
           <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-5">
-            <input
-              name="fullName"
-              placeholder="Full Name"
-              value={address.fullName}
-              onChange={handleInputChange}
-              disabled={selectedAddress !== 'new'}
-              required
-              className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-            />
-            <input
-              name="street"
-              placeholder="Street Address"
-              value={address.street}
-              onChange={handleInputChange}
-              disabled={selectedAddress !== 'new'}
-              required
-              className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-            />
-            <div className="grid grid-cols-2 gap-4">
+            {/* Full Name */}
+            <div>
               <input
-                name="city"
-                placeholder="City"
-                value={address.city}
+                name="fullName"
+                placeholder="Full Name"
+                value={address.fullName}
                 onChange={handleInputChange}
                 disabled={selectedAddress !== 'new'}
                 required
-                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400"
               />
-              <input
-                name="zip"
-                placeholder="ZIP Code"
-                value={address.zip}
-                onChange={handleInputChange}
-                disabled={selectedAddress !== 'new'}
-                required
-                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-              />
+              {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
             </div>
+
+            {/* Street */}
+            <div>
+              <input
+                name="street"
+                placeholder="Street Address"
+                value={address.street}
+                onChange={handleInputChange}
+                disabled={selectedAddress !== 'new'}
+                required
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400"
+              />
+              {errors.street && <p className="text-red-500 text-sm">{errors.street}</p>}
+            </div>
+
+            {/* City & ZIP */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <input
+                  name="city"
+                  placeholder="City"
+                  value={address.city}
+                  onChange={handleInputChange}
+                  disabled={selectedAddress !== 'new'}
+                  required
+                  className="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400"
+                />
+                {errors.city && <p className="text-red-500 text-sm">{errors.city}</p>}
+              </div>
+              <div>
+                <input
+                  name="zip"
+                  placeholder="ZIP Code"
+                  value={address.zip}
+                  onChange={handleInputChange}
+                  disabled={selectedAddress !== 'new'}
+                  required
+                  className="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400"
+                />
+                {errors.zip && <p className="text-red-500 text-sm">{errors.zip}</p>}
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div>
+              <input
+                name="phone"
+                placeholder="Phone Number"
+                value={address.phone}
+                onChange={handleInputChange}
+                disabled={selectedAddress !== 'new'}
+                required
+                className="w-full px-4 py-3 border rounded-lg shadow-sm focus:ring-2 focus:ring-pink-400"
+              />
+              {errors.phone && <p className="text-red-500 text-sm">{errors.phone}</p>}
+            </div>
+
+
           </form>
         </div>
 
         {/* Order Summary */}
         <OrderSummary loading={loading} error={error} />
-
       </div>
     </div>
   );
