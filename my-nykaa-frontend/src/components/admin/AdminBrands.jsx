@@ -30,12 +30,12 @@ const AdminBrands = () => {
     e.preventDefault();
     setFormError('');
     if (newBrandName.length > 255) {
-        setFormError('Brand name cannot exceed 255 characters.');
-        return;
+      setFormError('Brand name cannot exceed 255 characters.');
+      return;
     }
     if (newBrandImage.length > 2048) {
-        setFormError('Image URL cannot exceed 2048 characters.');
-        return;
+      setFormError('Image URL cannot exceed 2048 characters.');
+      return;
     }
     if (!newBrandName.trim()) return;
     try {
@@ -50,12 +50,12 @@ const AdminBrands = () => {
 
   const handleUpdate = async (id) => {
     if (editingBrand.name.length > 255) {
-        setError('Brand name cannot exceed 255 characters.');
-        return;
+      setError('Brand name cannot exceed 255 characters.');
+      return;
     }
     if (editingBrand.image.length > 2048) {
-        setError('Image URL cannot exceed 2048 characters.');
-        return;
+      setError('Image URL cannot exceed 2048 characters.');
+      return;
     }
     try {
       await api.updateBrand(id, {
@@ -86,15 +86,18 @@ const AdminBrands = () => {
     setEditingBrand(null);
   };
 
-  if (isLoading) return <p>Loading brands...</p>;
+  if (isLoading) return <p className="text-pink-600">Loading brands...</p>;
   if (error) return <p className="text-red-500">Error: {error}</p>;
 
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Manage Brands</h2>
+    <div className="p-6 bg-pink-50 min-h-screen">
+      <h2 className="text-3xl font-bold mb-6 text-pink-700">Manage Brands</h2>
 
-      <form onSubmit={handleCreate} className="mb-6 p-4 border rounded shadow-md">
-        <h3 className="text-xl font-semibold mb-2">Add New Brand</h3>
+      <form
+        onSubmit={handleCreate}
+        className="mb-6 p-4 border border-pink-200 rounded-lg shadow-md bg-white"
+      >
+        <h3 className="text-xl font-semibold mb-2 text-pink-700">Add New Brand</h3>
         {formError && <div className="text-red-500 mb-4">{formError}</div>}
         <div className="flex flex-col md:flex-row gap-4">
           <input
@@ -102,7 +105,7 @@ const AdminBrands = () => {
             value={newBrandName}
             onChange={(e) => setNewBrandName(e.target.value)}
             placeholder="Brand Name"
-            className="border p-2 rounded w-full"
+            className="border border-pink-300 p-2 rounded w-full focus:ring-2 focus:ring-pink-400 outline-none"
             required
           />
           <input
@@ -110,11 +113,11 @@ const AdminBrands = () => {
             value={newBrandImage}
             onChange={(e) => setNewBrandImage(e.target.value)}
             placeholder="Brand Image URL"
-            className="border p-2 rounded w-full"
+            className="border border-pink-300 p-2 rounded w-full focus:ring-2 focus:ring-pink-400 outline-none"
           />
           <button
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600 transition"
           >
             Add Brand
           </button>
@@ -123,7 +126,10 @@ const AdminBrands = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {brands.map((brand) => (
-          <div key={brand.id} className="p-4 border rounded shadow-md">
+          <div
+            key={brand.id}
+            className="p-4 border border-pink-200 rounded-lg shadow-md bg-white hover:shadow-lg transition"
+          >
             {editingBrand && editingBrand.id === brand.id ? (
               <div>
                 <input
@@ -132,7 +138,7 @@ const AdminBrands = () => {
                   onChange={(e) =>
                     setEditingBrand({ ...editingBrand, name: e.target.value })
                   }
-                  className="border p-2 rounded w-full mb-2"
+                  className="border border-pink-300 p-2 rounded w-full mb-2 focus:ring-2 focus:ring-pink-400 outline-none"
                 />
                 <input
                   type="text"
@@ -140,17 +146,17 @@ const AdminBrands = () => {
                   onChange={(e) =>
                     setEditingBrand({ ...editingBrand, image: e.target.value })
                   }
-                  className="border p-2 rounded w-full mb-2"
+                  className="border border-pink-300 p-2 rounded w-full mb-2 focus:ring-2 focus:ring-pink-400 outline-none"
                 />
                 <button
                   onClick={() => handleUpdate(brand.id)}
-                  className="bg-green-500 text-white px-2 py-1 rounded mr-2"
+                  className="bg-pink-500 text-white px-3 py-1 rounded mr-2 hover:bg-pink-600 transition"
                 >
                   Save
                 </button>
                 <button
                   onClick={cancelEditing}
-                  className="bg-gray-500 text-white px-2 py-1 rounded"
+                  className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500 transition"
                 >
                   Cancel
                 </button>
@@ -160,19 +166,19 @@ const AdminBrands = () => {
                 <img
                   src={brand.image}
                   alt={brand.name}
-                  className="w-24 h-24 object-contain mb-2"
+                  className="w-24 h-24 object-contain mb-2 rounded"
                 />
-                <p className="font-bold text-lg">{brand.name}</p>
+                <p className="font-bold text-lg text-pink-700">{brand.name}</p>
                 <div className="mt-2">
                   <button
                     onClick={() => startEditing(brand)}
-                    className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                    className="bg-pink-400 text-white px-3 py-1 rounded mr-2 hover:bg-pink-500 transition"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(brand.id)}
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="bg-red-400 text-white px-3 py-1 rounded hover:bg-red-500 transition"
                   >
                     Delete
                   </button>
