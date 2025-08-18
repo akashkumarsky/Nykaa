@@ -51,9 +51,21 @@ const CheckoutPage = ({ setPage }) => {
     }
   };
 
-  const subtotal = cart?.cartItems?.reduce((sum, item) => sum + item.product.price * item.quantity, 0) || 0;
+
+
+  const subtotal = cart?.cartItems?.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0
+  ) || 0;
+
   const shippingCost = subtotal > 500 ? 0 : 50;
-  const total = subtotal + shippingCost;
+
+  // GST (18%)
+  const gstRate = 0.18;
+  const gst = subtotal * gstRate;
+
+  // ✅ Correct total with GST + shipping
+  const total = subtotal + gst + shippingCost;
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -97,7 +109,9 @@ const CheckoutPage = ({ setPage }) => {
         quantity: item.quantity
       }));
 
+
       const paymentOrder = await api.post("/payment/create-order", { amount: total });
+
       const loaded = await loadRazorpayScript();
       if (!loaded) {
         setError("Failed to load Razorpay SDK");
@@ -117,6 +131,7 @@ const CheckoutPage = ({ setPage }) => {
             await api.post('/orders', {
               items: orderItems,
               shippingAddress,
+              totalAmount: total,
               razorpayPaymentId: response.razorpay_payment_id,
               razorpayOrderId: response.razorpay_order_id
             });

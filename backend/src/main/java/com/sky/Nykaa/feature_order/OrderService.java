@@ -76,7 +76,14 @@ public class OrderService {
 
         productRepository.saveAll(productsToUpdate);
         order.setOrderItems(orderItems);
-        order.setTotalAmount(totalAmount);
+
+// ✅ Take total from frontend request (which already includes GST + shipping)
+        if (request.getTotalAmount() != null && request.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {
+        order.setTotalAmount(request.getTotalAmount());
+        } else {
+        order.setTotalAmount(totalAmount); // fallback, just in case
+        }
+
         Order savedOrder = orderRepository.save(order);
 
         Cart userCart = cartRepository.findByUser_Id(user.getId())
