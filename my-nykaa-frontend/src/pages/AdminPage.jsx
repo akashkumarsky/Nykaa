@@ -29,15 +29,18 @@ const AdminPage = () => {
 
     const SidebarContent = () => (
         <div className="flex flex-col h-full">
-            <div className="p-4 border-b border-gray-700 flex items-center justify-between">
+            {/* Sidebar Header */}
+            <div className="p-4 border-b border-pink-300 flex items-center justify-between bg-pink-600">
                 <h1 className="text-xl font-bold text-white">Nykaa Admin</h1>
                 <button
-                    className="md:hidden text-gray-400 hover:text-white"
+                    className="md:hidden text-pink-100 hover:text-white"
                     onClick={() => setSidebarOpen(false)}
                 >
                     <X size={22} />
                 </button>
             </div>
+
+            {/* Sidebar Tabs */}
             <nav className="flex flex-col mt-4">
                 {tabs.map((tab) => (
                     <button
@@ -46,9 +49,9 @@ const AdminPage = () => {
                             setActiveTab(tab.key);
                             setSidebarOpen(false);
                         }}
-                        className={`flex items-center gap-3 px-4 py-3 text-left transition-colors ${activeTab === tab.key
-                                ? "bg-blue-600 text-white font-semibold"
-                                : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        className={`flex items-center gap-3 px-4 py-3 text-left transition-colors rounded-md mx-2 mb-2 ${activeTab === tab.key
+                                ? "bg-pink-500 text-white font-semibold shadow-md"
+                                : "text-gray-700 hover:bg-pink-100 hover:text-pink-600"
                             }`}
                     >
                         {tab.icon}
@@ -60,18 +63,18 @@ const AdminPage = () => {
     );
 
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-pink-50">
             {/* Overlay for mobile */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden"
+                    className="fixed inset-0 bg-black bg-opacity-40 z-30 md:hidden"
                     onClick={() => setSidebarOpen(false)}
                 ></div>
             )}
 
             {/* Sidebar */}
             <div
-                className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-gray-800 shadow-lg transform transition-transform duration-300 md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-pink-200 shadow-lg transform transition-transform duration-300 md:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
             >
                 <SidebarContent />
@@ -80,18 +83,18 @@ const AdminPage = () => {
             {/* Main Content */}
             <div className="flex-1 flex flex-col">
                 {/* Mobile Navbar */}
-                <div className="md:hidden flex items-center justify-between bg-white shadow px-4 py-3 sticky top-0 z-20">
-                    <button onClick={() => setSidebarOpen(true)} className="text-gray-600">
+                <div className="md:hidden flex items-center justify-between bg-pink-600 text-white shadow px-4 py-3 sticky top-0 z-20">
+                    <button onClick={() => setSidebarOpen(true)} className="text-white">
                         <Menu size={24} />
                     </button>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                        {tabs.find(t => t.key === activeTab)?.label}
+                    <h2 className="text-lg font-semibold">
+                        {tabs.find((t) => t.key === activeTab)?.label}
                     </h2>
                     <div className="w-6"></div> {/* Spacer */}
                 </div>
 
                 {/* Content Area */}
-                <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+                <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-white rounded-tl-2xl shadow-inner">
                     {renderContent()}
                 </main>
             </div>

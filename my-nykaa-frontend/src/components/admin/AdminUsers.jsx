@@ -42,9 +42,9 @@ const AdminUsers = () => {
     };
 
     const getRoleClasses = (role) => {
-        return role === 'ROLE_ADMIN'
-            ? 'bg-green-100 text-green-800'
-            : 'bg-purple-100 text-purple-800';
+        return role === "ROLE_ADMIN"
+            ? "bg-pink-200 text-pink-900"
+            : "bg-pink-100 text-pink-700";
     };
 
     // Pagination Logic
@@ -56,30 +56,30 @@ const AdminUsers = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-center py-10 bg-red-50 p-4 rounded-lg">
-                <h3 className="text-lg font-semibold text-red-700">An Error Occurred</h3>
-                <p className="text-red-600">{error}</p>
+            <div className="text-center py-10 bg-pink-50 p-4 rounded-lg">
+                <h3 className="text-lg font-semibold text-pink-700">An Error Occurred</h3>
+                <p className="text-pink-600">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="min-h-screen bg-pink-50 p-4 md:p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-                <h2 className="text-2xl font-bold text-gray-800">Manage Users</h2>
+                <h2 className="text-2xl font-bold text-pink-900">Manage Users</h2>
             </div>
 
             {/* Table View (for medium screens and up) */}
             <div className="hidden md:block overflow-x-auto shadow rounded-lg bg-white">
                 <table className="min-w-full">
-                    <thead className="bg-blue-500 text-white">
+                    <thead className="bg-pink-500 text-white">
                         <tr>
                             <th className="py-3 px-4 text-left">User ID</th>
                             <th className="py-3 px-4 text-left">Name</th>
@@ -91,24 +91,36 @@ const AdminUsers = () => {
                     <tbody>
                         {currentUsers.length > 0 ? (
                             currentUsers.map((user, index) => (
-                                <tr key={user.id} className={`hover:bg-gray-100 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}>
+                                <tr
+                                    key={user.id}
+                                    className={`hover:bg-pink-50 ${index % 2 === 0 ? "bg-pink-100" : "bg-white"
+                                        }`}
+                                >
                                     <td className="py-3 px-4 font-medium">#{user.id}</td>
                                     <td className="py-3 px-4">{`${user.firstName} ${user.lastName}`}</td>
                                     <td className="py-3 px-4">{user.email}</td>
                                     <td className="py-3 px-4 text-center">
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleClasses(user.role)}`}>
-                                            {user.role.replace('ROLE_', '')}
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleClasses(
+                                                user.role
+                                            )}`}
+                                        >
+                                            {user.role.replace("ROLE_", "")}
                                         </span>
                                     </td>
                                     <td className="py-3 px-4 text-center">
                                         <div className="relative inline-block max-w-[10rem] w-full">
                                             <select
                                                 value={user.role}
-                                                onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white truncate"
+                                                onChange={(e) =>
+                                                    handleRoleChange(user.id, e.target.value)
+                                                }
+                                                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-pink-400 bg-white truncate"
                                             >
                                                 {userRoles.map((role) => (
-                                                    <option key={role} value={role}>{role.replace('ROLE_', '')}</option>
+                                                    <option key={role} value={role}>
+                                                        {role.replace("ROLE_", "")}
+                                                    </option>
                                                 ))}
                                             </select>
                                         </div>
@@ -117,7 +129,12 @@ const AdminUsers = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="py-6 text-center text-gray-500 italic">No users found.</td>
+                                <td
+                                    colSpan="5"
+                                    className="py-6 text-center text-pink-500 italic"
+                                >
+                                    No users found.
+                                </td>
                             </tr>
                         )}
                     </tbody>
@@ -127,27 +144,40 @@ const AdminUsers = () => {
             {/* Card View (for small screens) */}
             <div className="grid gap-4 md:hidden">
                 {currentUsers.map((user) => (
-                    <div key={user.id} className="bg-white shadow rounded-lg p-4 border flex flex-col">
+                    <div
+                        key={user.id}
+                        className="bg-white shadow rounded-lg p-4 border border-pink-200 flex flex-col"
+                    >
                         <div className="flex justify-between items-start mb-2">
                             <div>
-                                <p className="font-semibold text-lg">{`${user.firstName} ${user.lastName}`}</p>
-                                <p className="text-sm text-gray-500">ID: {user.id}</p>
+                                <p className="font-semibold text-lg text-pink-900">{`${user.firstName} ${user.lastName}`}</p>
+                                <p className="text-sm text-pink-500">ID: {user.id}</p>
                             </div>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleClasses(user.role)}`}>
-                                {user.role.replace('ROLE_', '')}
+                            <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getRoleClasses(
+                                    user.role
+                                )}`}
+                            >
+                                {user.role.replace("ROLE_", "")}
                             </span>
                         </div>
-                        <p className="text-gray-600">{user.email}</p>
+                        <p className="text-pink-700">{user.email}</p>
                         <div className="mt-auto pt-3">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Update Role</label>
+                            <label className="block text-sm font-medium text-pink-700 mb-1">
+                                Update Role
+                            </label>
                             <div className="relative w-full max-w-full">
                                 <select
                                     value={user.role}
-                                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white truncate"
+                                    onChange={(e) =>
+                                        handleRoleChange(user.id, e.target.value)
+                                    }
+                                    className="w-full p-2 border rounded-md focus:ring-2 focus:ring-pink-400 bg-white truncate"
                                 >
                                     {userRoles.map((role) => (
-                                        <option key={role} value={role}>{role.replace('ROLE_', '')}</option>
+                                        <option key={role} value={role}>
+                                            {role.replace("ROLE_", "")}
+                                        </option>
                                     ))}
                                 </select>
                             </div>

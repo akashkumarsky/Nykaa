@@ -26,12 +26,11 @@ const AdminProducts = () => {
             try {
                 setLoading(true);
                 const [productsData, categoriesData, brandsData] = await Promise.all([
-                    api.get(`/products?size=1000`), // Fetch all products
+                    api.get(`/products?size=1000`),
                     api.get("/products/categories"),
                     api.get("/products/brands"),
                 ]);
 
-                // Sort products by ID in descending order
                 const sortedProducts = productsData.content.sort((a, b) => b.id - a.id);
                 setAllProducts(sortedProducts);
 
@@ -110,21 +109,20 @@ const AdminProducts = () => {
         });
     };
 
-    // Pagination Logic
+    // Pagination
     const indexOfLastProduct = (currentPage + 1) * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = allProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(allProducts.length / productsPerPage);
 
-
     if (loading) return <div>Loading...</div>;
     if (error) return <div className="text-red-500">Error: {error}</div>;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="min-h-screen bg-pink-50 p-4 md:p-8">
             {/* Form */}
-            <div className="mb-8 bg-white shadow rounded-lg p-4 md:p-6">
-                <h3 className="text-lg font-bold mb-4">
+            <div className="mb-8 bg-white shadow-lg rounded-xl p-4 md:p-6 border border-pink-200">
+                <h3 className="text-lg font-bold mb-4 text-pink-700">
                     {editingProduct ? "Edit Product" : "Add New Product"}
                 </h3>
                 <form
@@ -137,7 +135,7 @@ const AdminProducts = () => {
                         value={editingProduct ? editingProduct.name : newProduct.name}
                         onChange={handleInputChange}
                         placeholder="Name"
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     />
                     <input
@@ -146,7 +144,7 @@ const AdminProducts = () => {
                         value={editingProduct ? editingProduct.description : newProduct.description}
                         onChange={handleInputChange}
                         placeholder="Description"
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     />
                     <input
@@ -155,7 +153,7 @@ const AdminProducts = () => {
                         value={editingProduct ? editingProduct.price : newProduct.price}
                         onChange={handleInputChange}
                         placeholder="Price"
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     />
                     <input
@@ -164,7 +162,7 @@ const AdminProducts = () => {
                         value={editingProduct ? editingProduct.imageUrl : newProduct.imageUrl}
                         onChange={handleInputChange}
                         placeholder="Image URL"
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     />
                     <input
@@ -175,14 +173,14 @@ const AdminProducts = () => {
                         }
                         onChange={handleInputChange}
                         placeholder="Stock Quantity"
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     />
                     <select
                         name="categoryId"
                         value={editingProduct ? editingProduct.categoryId : newProduct.categoryId}
                         onChange={handleInputChange}
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     >
                         <option value="">Select Category</option>
@@ -196,7 +194,7 @@ const AdminProducts = () => {
                         name="brandId"
                         value={editingProduct ? editingProduct.brandId : newProduct.brandId}
                         onChange={handleInputChange}
-                        className="p-2 border rounded"
+                        className="p-2 border rounded focus:ring-2 focus:ring-pink-400"
                         required
                     >
                         <option value="">Select Brand</option>
@@ -209,14 +207,14 @@ const AdminProducts = () => {
                     <div className="flex gap-2 mt-2">
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                            className="bg-pink-600 text-white p-2 rounded hover:bg-pink-700 transition"
                         >
                             {editingProduct ? "Update Product" : "Add Product"}
                         </button>
                         {editingProduct && (
                             <button
                                 onClick={() => setEditingProduct(null)}
-                                className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+                                className="bg-gray-400 text-white p-2 rounded hover:bg-gray-500"
                             >
                                 Cancel
                             </button>
@@ -226,9 +224,9 @@ const AdminProducts = () => {
             </div>
 
             {/* Table (desktop) */}
-            <div className="hidden md:block overflow-x-auto shadow rounded-lg bg-white">
+            <div className="hidden md:block overflow-x-auto shadow-lg rounded-xl bg-white border border-pink-200">
                 <table className="min-w-full">
-                    <thead className="bg-blue-500 text-white">
+                    <thead className="bg-pink-600 text-white">
                         <tr>
                             <th className="py-2 px-4">ID</th>
                             <th className="py-2 px-4">Name</th>
@@ -241,7 +239,7 @@ const AdminProducts = () => {
                     </thead>
                     <tbody>
                         {currentProducts.map((p) => (
-                            <tr key={p.id} className="border-b hover:bg-gray-50">
+                            <tr key={p.id} className="border-b hover:bg-pink-50">
                                 <td className="py-3 px-4 font-medium">#{p.id}</td>
                                 <td className="py-2 px-4 text-center">{p.name}</td>
                                 <td className="py-2 px-4 text-center">{p.categoryName}</td>
@@ -251,13 +249,13 @@ const AdminProducts = () => {
                                 <td className="py-2 px-4 text-center">
                                     <button
                                         onClick={() => startEditing(p)}
-                                        className="bg-yellow-500 text-white px-3 py-1 rounded mr-2"
+                                        className="bg-pink-400 text-white px-3 py-1 rounded hover:bg-pink-500 mr-2"
                                     >
                                         Edit
                                     </button>
                                     <button
                                         onClick={() => handleDeleteProduct(p.id)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded"
+                                        className="bg-rose-500 text-white px-3 py-1 rounded hover:bg-rose-600"
                                     >
                                         Delete
                                     </button>
@@ -271,21 +269,21 @@ const AdminProducts = () => {
             {/* Cards (mobile) */}
             <div className="grid gap-4 md:hidden">
                 {currentProducts.map((p) => (
-                    <div key={p.id} className="bg-white p-4 shadow rounded-lg">
+                    <div key={p.id} className="bg-white p-4 shadow-lg rounded-xl border border-pink-200">
                         <p className="text-sm text-gray-500">ID: {p.id}</p>
-                        <p className="font-bold text-lg">{p.name}</p>
+                        <p className="font-bold text-lg text-pink-700">{p.name}</p>
                         <p className="text-gray-600">{p.categoryName} | {p.brandName}</p>
-                        <p className="mt-1">${p.price.toFixed(2)} | Stock: {p.stockQuantity}</p>
+                        <p className="mt-1 text-gray-800">${p.price.toFixed(2)} | Stock: {p.stockQuantity}</p>
                         <div className="flex gap-2 mt-3">
                             <button
                                 onClick={() => startEditing(p)}
-                                className="bg-yellow-500 text-white flex-1 py-2 rounded"
+                                className="bg-pink-400 text-white flex-1 py-2 rounded hover:bg-pink-500"
                             >
                                 Edit
                             </button>
                             <button
                                 onClick={() => handleDeleteProduct(p.id)}
-                                className="bg-red-500 text-white flex-1 py-2 rounded"
+                                className="bg-rose-500 text-white flex-1 py-2 rounded hover:bg-rose-600"
                             >
                                 Delete
                             </button>

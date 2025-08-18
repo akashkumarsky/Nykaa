@@ -44,7 +44,7 @@ const AdminOrders = () => {
             case 'pending':
                 return 'bg-yellow-100 text-yellow-800';
             case 'processing':
-                return 'bg-indigo-100 text-indigo-800';
+                return 'bg-purple-100 text-purple-800';
             case 'shipped':
                 return 'bg-blue-100 text-blue-800';
             case 'delivered':
@@ -64,7 +64,7 @@ const AdminOrders = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div>
             </div>
         );
     }
@@ -79,15 +79,15 @@ const AdminOrders = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="min-h-screen bg-pink-50 p-4 md:p-8">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
-                <h2 className="text-2xl font-bold text-gray-800">Manage Orders</h2>
+                <h2 className="text-2xl font-bold text-pink-700">Manage Orders</h2>
             </div>
 
             {/* Table View (for medium screens and up) */}
             <div className="hidden md:block overflow-x-auto shadow rounded-lg bg-white">
                 <table className="min-w-full">
-                    <thead className="bg-blue-500 text-white">
+                    <thead className="bg-pink-500 text-white">
                         <tr>
                             <th className="py-3 px-4 text-left">Order ID</th>
                             <th className="py-3 px-4 text-left">Customer</th>
@@ -100,7 +100,7 @@ const AdminOrders = () => {
                     <tbody>
                         {currentOrders.length > 0 ? (
                             currentOrders.map((order, index) => (
-                                <tr key={order.id} className={`hover:bg-gray-100 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                                <tr key={order.id} className={`hover:bg-pink-50 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
                                     <td className="py-3 px-4 font-medium">#{order.id}</td>
                                     <td className="py-3 px-4">{`${order.user.firstName} ${order.user.lastName}`}</td>
                                     <td className="py-3 px-4">{new Date(order.orderDate).toLocaleDateString()}</td>
@@ -114,7 +114,7 @@ const AdminOrders = () => {
                                         <select
                                             value={order.status}
                                             onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                            className="p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white"
+                                            className="p-2 border rounded-md focus:ring-2 focus:ring-pink-400 bg-white"
                                         >
                                             {orderStatuses.map(status => (
                                                 <option key={status} value={status}>{status}</option>
@@ -135,10 +135,10 @@ const AdminOrders = () => {
             {/* Card View (for small screens) */}
             <div className="grid gap-4 md:hidden">
                 {currentOrders.map(order => (
-                    <div key={order.id} className="bg-white shadow rounded-lg p-4 border flex flex-col">
+                    <div key={order.id} className="bg-white shadow rounded-lg p-4 border border-pink-100 flex flex-col">
                         <div className="flex justify-between items-start mb-2">
                             <div>
-                                <p className="font-bold text-lg">Order #{order.id}</p>
+                                <p className="font-bold text-lg text-pink-700">Order #{order.id}</p>
                                 <p className="text-sm text-gray-600">{`${order.user.firstName} ${order.user.lastName}`}</p>
                             </div>
                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusClasses(order.status)}`}>
@@ -146,13 +146,13 @@ const AdminOrders = () => {
                             </span>
                         </div>
                         <p className="text-gray-500 text-sm">Date: {new Date(order.orderDate).toLocaleDateString()}</p>
-                        <p className="text-xl font-semibold my-2">Total: ₹{order.totalAmount.toFixed(2)}</p>
+                        <p className="text-xl font-semibold my-2 text-pink-700">Total: ₹{order.totalAmount.toFixed(2)}</p>
                         <div className="mt-auto">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Update Status</label>
+                            <label className="block text-sm font-medium text-pink-600 mb-1">Update Status</label>
                             <select
                                 value={order.status}
                                 onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-400 bg-white"
+                                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-pink-400 bg-white"
                             >
                                 {orderStatuses.map(status => (
                                     <option key={status} value={status}>{status}</option>
