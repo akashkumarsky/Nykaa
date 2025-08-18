@@ -20,6 +20,8 @@ public class Brand {
     @Column(nullable = false, unique = true)
     private String name;
 
+    private String image;
+
     @OneToMany(mappedBy = "brand")
     @JsonManagedReference("product-brand") // Named managed reference
     private Set<Product> products;

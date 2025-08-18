@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 // A reusable component for each collapsible filter section
 const FilterSection = ({ title, options, selected, onChange, type = 'checkbox' }) => (
     <details className="border-b border-pink-200 py-2">
-        <summary className="font-semibold cursor-pointer flex justify-between items-center py-2 text-black-800">
+        <summary className="font-semibold cursor-pointer flex justify-between items-center py-2 text-black">
             {title}
             <ChevronDown className="h-5 w-5 transition-transform details-open:rotate-180" />
         </summary>
@@ -24,9 +24,12 @@ const FilterSection = ({ title, options, selected, onChange, type = 'checkbox' }
                             value={value}
                             checked={selected.includes(value)}
                             onChange={() => onChange(value)}
-                            className={`h-4 w-4 border-pink-300 text-black-600 focus:ring-pink-500 ${type === 'radio' ? 'rounded-full' : 'rounded'}`}
+                            className={`h-4 w-4 border-pink-400 accent-pink-600 focus:ring-pink-500 ${type === 'radio' ? 'rounded-full' : 'rounded'}`}
                         />
-                        <label htmlFor={`${title}-${value}`} className="ml-3 text-sm text-black-800">
+                        <label
+                            htmlFor={`${title}-${value}`}
+                            className="ml-3 text-sm text-black"
+                        >
                             {label}
                         </label>
                     </li>
@@ -42,7 +45,7 @@ const Sidebar = ({
     selectedBrands, onBrandChange,
     selectedPrice, onPriceChange
 }) => {
-    // Define the fixed price ranges as seen in the image
+    // Define the fixed price ranges
     const priceOptions = [
         { label: 'Any Price', value: 'any' },
         { label: 'Rs. 0 - Rs. 499', value: '0-499' },
@@ -53,7 +56,9 @@ const Sidebar = ({
 
     return (
         <div className="bg-pink-50 p-4 rounded-lg shadow-md">
-            <h2 className="text-lg font-bold text-black-800 border-b border-pink-200 pb-2">Filters</h2>
+            <h2 className="text-lg font-bold text-black border-b border-pink-200 pb-2">
+                Filters
+            </h2>
             <FilterSection
                 title="Price"
                 options={priceOptions}

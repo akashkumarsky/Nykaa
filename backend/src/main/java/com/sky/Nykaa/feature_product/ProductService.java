@@ -70,6 +70,44 @@ public class ProductService {
         return brandRepository.findAll();
     }
 
+    public Category createCategory(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public Category updateCategory(Long id, Category categoryDetails) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
+        category.setName(categoryDetails.getName());
+        category.setImage(categoryDetails.getImage());
+        return categoryRepository.save(category);
+    }
+
+    public void deleteCategory(Long id) {
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Category not found with id: " + id);
+        }
+        categoryRepository.deleteById(id);
+    }
+
+    public Brand createBrand(Brand brand) {
+        return brandRepository.save(brand);
+    }
+
+    public Brand updateBrand(Long id, Brand brandDetails) {
+        Brand brand = brandRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + id));
+        brand.setName(brandDetails.getName());
+        brand.setImage(brandDetails.getImage());
+        return brandRepository.save(brand);
+    }
+
+    public void deleteBrand(Long id) {
+        if (!brandRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Brand not found with id: " + id);
+        }
+        brandRepository.deleteById(id);
+    }
+
     @Transactional
     public void deleteProduct(Long id) {
         if (!productRepository.existsById(id)) {

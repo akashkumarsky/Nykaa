@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import AdminProducts from "../components/admin/AdminProducts";
 import AdminOrders from "../components/admin/AdminOrders";
 import AdminUsers from "../components/admin/AdminUsers";
-import { Menu, X, Package, ShoppingCart, Users } from "lucide-react";
+import AdminCategories from "../components/admin/AdminCategories";
+import AdminBrands from "../components/admin/AdminBrands";
+import { Menu, X, Package, ShoppingCart, Users, LayoutGrid, Award } from "lucide-react";
 
 const AdminPage = () => {
     const [activeTab, setActiveTab] = useState("products");
@@ -12,6 +14,8 @@ const AdminPage = () => {
         { key: "products", label: "Products", icon: <Package size={20} /> },
         { key: "orders", label: "Orders", icon: <ShoppingCart size={20} /> },
         { key: "users", label: "Users", icon: <Users size={20} /> },
+        { key: "categories", label: "Categories", icon: <LayoutGrid size={20} /> },
+        { key: "brands", label: "Brands", icon: <Award size={20} /> },
     ];
 
     const renderContent = () => {
@@ -22,6 +26,10 @@ const AdminPage = () => {
                 return <AdminOrders />;
             case "users":
                 return <AdminUsers />;
+            case "categories":
+                return <AdminCategories />;
+            case "brands":
+                return <AdminBrands />;
             default:
                 return <AdminProducts />;
         }
