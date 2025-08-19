@@ -171,7 +171,7 @@ const CheckoutPage = ({ setPage }) => {
       }
 
       const options = {
-        key: "rzp_test_R5HVrH32DhPWyq",
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: paymentOrder.amount,
         currency: "INR",
         name: "Nykaa Clone",

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import java.security.Key;
@@ -16,10 +17,8 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
 
-    // **FIXED**: Using a static, hardcoded secret key.
-    // This key is now constant across application restarts, which will fix the signature mismatch error.
-    // In a real production app, this would be loaded from an external configuration file.
-    public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    @Value("${jwt.secret}")
+    private String secret;
 
     private final long expirationTime = 1000 * 60 * 60 * 24; // 24 hours
 
@@ -66,7 +65,7 @@ public class JwtUtil {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
