@@ -3,8 +3,8 @@ import { api } from '../api';
 import Sidebar from '../components/Products/Sidebar.jsx';
 import ProductGrid from '../components/Products/ProductGrid.jsx';
 import Pagination from '../components/ui/Pagination.jsx';
-import ProductPreviewModal from '../components/products/ProductPreviewModal.jsx';
-import FilterModal from '../components/products/FilterModal.jsx';
+import ProductPreviewModal from '../components/Products/ProductPreviewModal.jsx';
+import FilterModal from '../components/Products/FilterModal.jsx';
 import { Filter } from 'lucide-react';
 
 const AllProductsPage = ({ setPage, setSelectedProductId }) => {

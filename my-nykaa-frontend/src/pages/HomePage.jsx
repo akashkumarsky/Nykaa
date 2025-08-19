@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { api } from '../api';
 import ProductGrid from '../components/Products/ProductGrid.jsx';
 import Pagination from '../components/ui/Pagination.jsx';
-import ProductPreviewModal from '../components/products/ProductPreviewModal.jsx';
+import ProductPreviewModal from '../components/Products/ProductPreviewModal.jsx';
 import Carousel from '../components/ui/Carousel.jsx'; // Banner carousel
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
