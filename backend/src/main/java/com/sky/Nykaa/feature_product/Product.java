@@ -19,7 +19,8 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Lob
+    // This is the corrected line
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
