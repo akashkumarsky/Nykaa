@@ -3,7 +3,7 @@ services:
   - type: web
     name: nykaa-backend
     env: docker
-    repo: https://github.com/akashkumarsky/Nykaa # <-- Make sure this is your correct repository URL
+    repo: https://github.com/akashkumarsky/Nykaa # Make sure this is your correct repository URL
     rootDir: backend
     healthCheckPath: /api/products # A simple endpoint to check if the service is up
     envVars:
@@ -12,7 +12,7 @@ services:
       - key: SPRING_DATASOURCE_USERNAME
         value: neondb_owner
       - key: SPRING_DATASOURCE_PASSWORD
-        value: npg_Wx6za1EPRFTv # <-- IMPORTANT: Paste your actual Neon password here
+        value: npg_Wx6za1EPRFTv # <-- IMPORTANT: Double-check this is your full, correct Neon password
       - key: JWT_SECRET
         generateValue: true # Let Render generate a secure random value
       - key: RAZORPAY_KEY_ID
@@ -24,12 +24,12 @@ services:
   - type: web
     name: nykaa-frontend
     env: docker
-    repo: https://github.com/akashkumarsky/Nykaa # <-- Make sure this is your correct repository URL
+    repo: https://github.com/akashkumarsky/Nykaa # Make sure this is your correct repository URL
     rootDir: my-nykaa-frontend
     envVars:
       - key: VITE_RAZORPAY_KEY_ID
         value: rzp_test_R5HVrH32DhPWyq
     # This is the rewrite rule that was missing from the UI
     rewrites:
-      - source: /api/:path*
-        destination: https://nykaa-backend.onrender.com/:path*
+      - source: /api/*
+        destination: https://nykaa-backend.onrender.com/api/* # <-- This is the corrected line
