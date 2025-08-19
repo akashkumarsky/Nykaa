@@ -29,7 +29,8 @@ services:
     envVars:
       - key: VITE_RAZORPAY_KEY_ID
         value: rzp_test_R5HVrH32DhPWyq
-    # This is the rewrite rule that was missing from the UI
-    rewrites:
-      - source: /api/*
-        destination: https://nykaa-backend.onrender.com/* # <-- This is the corrected line
+    # HTTP configuration including the rewrite rule
+    http:
+      rewrites:
+        - source: /api/*
+          destination: https://nykaa-backend.onrender.com/api/*
