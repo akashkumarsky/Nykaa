@@ -65,13 +65,17 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
+  @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        
+        // This is the secure way to do it.
+        // It specifically allows your frontend to make requests.
+        configuration.setAllowedOrigins(Arrays.asList("https://nykaa-frontend.onrender.com")); 
+        
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true); // Allowing credentials is often needed for authentication.
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

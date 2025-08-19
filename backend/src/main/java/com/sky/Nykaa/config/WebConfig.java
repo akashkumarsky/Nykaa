@@ -12,12 +12,5 @@ public class WebConfig implements WebMvcConfigurer {
      * This allows the React frontend (running on a different port) to communicate
      * with the Spring Boot backend.
      */
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**") // Apply CORS to all API endpoints
-                .allowedOriginPatterns("*") // Allow all origins
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+   
 }
