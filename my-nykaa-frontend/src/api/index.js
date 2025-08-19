@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const fetchWithAuth = async (endpoint, options = {}) => {
   const storedUser = localStorage.getItem('nykaaUser');
@@ -27,13 +27,10 @@ const fetchWithAuth = async (endpoint, options = {}) => {
     );
   }
 
-  // FIXED: Check if the response has a JSON body before trying to parse it.
-  // This makes the helper robust enough to handle responses with no content (e.g., 204 status).
   const contentType = response.headers.get('content-type');
   if (contentType && contentType.indexOf('application/json') !== -1) {
     return response.json();
   } else {
-    // If there's no JSON, we don't return anything.
     return;
   }
 };
